@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/product_images_viewpager"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/product_images_viewpager_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/product_images_viewpager"
+        app:tabBackground="@drawable/dot_selector"
+        app:tabIndicatorHeight="0dp"
+        app:tabRippleColor="@null" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:visibility="gone"
+        android:id="@+id/add_to_wishList_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:backgroundTint="#fff"
+        android:clickable="true"
+        app:rippleColor="@color/colorRed"
+        android:tint="#4e4e4e"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_favorite_black_24dp"
+        android:focusable="true"
+        tools:ignore="VectorDrawableCompat" />
+
+    <TextView
+        android:id="@+id/product_item_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="8dp"
+        android:maxLines="3"
+        android:text="Xiomi - Redmi Note 3 | 2GB + 32 GB | only in India | 4200 mAh | $299/-"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/product_images_viewpager_indicator" />
+
+    <TextView
+        android:id="@+id/product_item_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="$ 1,499/-"
+        android:textColor="@color/colorPrimary"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/product_item_name"
+        app:layout_constraintTop_toBottomOf="@+id/product_item_name" />
+
+    <TextView
+        android:id="@+id/product_item_cut_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:text="$ 1,999/-"
+        android:textColor="#2e2e2e"
+        app:layout_constraintBottom_toBottomOf="@+id/product_item_price"
+        app:layout_constraintStart_toEndOf="@+id/product_item_price" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="#2e2e2e"
+        app:layout_constraintBottom_toBottomOf="@+id/product_item_cut_price"
+        app:layout_constraintEnd_toEndOf="@+id/product_item_cut_price"
+        app:layout_constraintStart_toStartOf="@+id/product_item_cut_price"
+        app:layout_constraintTop_toTopOf="@+id/product_item_cut_price" />
+
+    <TextView
+        android:id="@+id/product_item_cod_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:background="@drawable/x_ractangle_layout"
+        android:backgroundTint="@color/colorPrimary"
+        android:padding="4dp"
+        android:text="COD/POD"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/product_item_cut_price"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/product_item_name" />
+
+    <TextView
+        android:id="@+id/product_item_cod_sub_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:text="available"
+        app:layout_constraintEnd_toEndOf="@+id/product_item_cod_text"
+        app:layout_constraintStart_toStartOf="@+id/product_item_cod_text"
+        app:layout_constraintTop_toBottomOf="@+id/product_item_cod_text" />
+
+    <TextView
+        android:id="@+id/product_item_stocks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="In Stock"
+        android:padding="4dp"
+        android:textColor="@color/colorYellow"
+        android:background="@color/colorSecondary"
+        app:layout_constraintBottom_toTopOf="@+id/product_item_name"
+        app:layout_constraintEnd_toEndOf="@+id/product_item_name" />
+
+    <TextView
+        android:id="@+id/product_off_per"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20% OFF"
+        android:padding="4dp"
+        android:textColor="@color/colorWhite"
+        android:background="@drawable/back_design_one"
+        app:layout_constraintBottom_toBottomOf="@+id/product_item_cut_price"
+        app:layout_constraintEnd_toStartOf="@+id/product_item_cod_text"
+        app:layout_constraintStart_toEndOf="@+id/product_item_cut_price"
+        app:layout_constraintTop_toBottomOf="@+id/product_item_name" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

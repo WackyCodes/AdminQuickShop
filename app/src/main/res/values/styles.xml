@@ -1,0 +1,77 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+<!-- Base application theme. -->
+<style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <!-- Customize your theme here. -->
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorControlNormal">@color/colorWhite</item>
+    <item name="colorAccent">@color/colorAccent</item>
+
+    <!-- enable window content transitions -->
+    <item name="android:windowActivityTransitions" tools:ignore="NewApi">true</item>
+
+</style>
+
+    <style name="SpinnerTheme" parent="Widget.AppCompat.Spinner">
+        <item name="android:drawableRight">@drawable/ic_arrow_drop_down_black_24dp</item>
+    </style>
+
+
+    <!-- Base application theme. -->
+    <style name="EditTextTheme" parent="AppTheme">
+        <item name="colorControlNormal">@color/colorGray</item>
+        <item name="colorAccent">@color/colorSecondary</item>
+    </style>
+
+
+    <!-- Base application theme. -->
+<style name="MenuTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+    <!-- Customize your theme here. -->
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorControlNormal">@color/colorWhite</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorAccent</item>
+</style>
+
+
+
+<style name="ToolTheme" parent="Widget.AppCompat.Light.PopupMenu">
+    <!-- Customize your theme here. -->
+    <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_black_24dp</item>
+    <item name="colorControlNormal">@color/colorWhite</item>
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorAccent</item>
+
+</style>
+
+<style name="AddressTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <!-- Customize your theme here. -->
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorControlNormal">@color/colorWhite</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorSecondary</item>
+</style>
+
+<style name="AppTheme.NoActionBar">
+
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+</style>
+
+<style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+<style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+<!--    Paytm  -->
+
+<style name="paytmTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <!-- Customize your theme here. -->
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorBlue</item>
+</style>
+
+</resources>
+

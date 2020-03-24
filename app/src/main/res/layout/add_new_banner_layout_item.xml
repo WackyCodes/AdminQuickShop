@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:elevation="6dp"
+        android:textAlignment="center"
+        android:background="#D30D0E0D">
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/back_white_rad_8dp"
+            android:backgroundTint="@color/colorWhite"
+            android:padding="15dp"
+            android:layout_margin="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorSecondary"
+                android:textSize="12sp"
+                android:paddingLeft="8dp"
+                android:text="Your Banner will look like this to the customers."/>
+            <ImageView
+                android:id="@+id/banner_image"
+                android:layout_width="match_parent"
+                android:layout_height="230dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/banner_placeholder"
+                android:backgroundTint="@color/colorRecyclerBack"
+                android:background="@drawable/back_white_rad_8dp"
+                android:padding="14dp"/>
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/strip_image"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/back_white_rad_8dp"
+                android:backgroundTint="@color/colorRecyclerBack"
+                android:padding="12dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/strip_ad_placeholder"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layout1" />
+            <TextView
+                android:id="@+id/change_banner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="+ Add / Change Image"
+                android:textAllCaps="true"
+                android:textSize="12sp"
+                android:layout_marginTop="10dp"
+                android:padding="5dp"
+                android:visibility="visible"
+                android:textColor="@color/colorPrimary"
+                android:textAlignment="center"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorSecondary"
+                android:textSize="12sp"
+                android:paddingLeft="8dp"
+                android:layout_marginTop="15dp"
+                android:text="Enter Or Pick Background Color"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:drawablePadding="4dp"
+                    android:background="@drawable/back_white_one__dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:drawableLeft="@drawable/ic_edit_black_24dp"
+                        android:drawableTint="@color/colorPrimary"
+                        android:textColor="@color/colorSecondary"
+                        android:textAlignment="viewEnd"
+                        android:paddingLeft="4dp"
+                        android:text="#"
+                        android:textSize="16sp"
+                        android:gravity="end" />
+                    <EditText
+                        android:id="@+id/banner_bg"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:hint="EnterColor"
+                        android:inputType="number"
+                        android:maxLength="8"
+                        android:paddingLeft="1dp"
+                        android:paddingTop="0dp"
+                        android:paddingBottom="0dp"
+                        android:scrollbars="none"
+                        android:textColor="@color/colorSecondary"
+                        android:textCursorDrawable="@drawable/wacky_cursor"
+                        android:textSize="16sp" />
+                </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/colorSecondary"
+                    android:text="OR"/>
+                <TextView
+                    android:id="@+id/color_pick_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/back_white_one__dp"
+                    android:backgroundTint="@color/colorRecyclerBack"
+                    android:drawableLeft="@drawable/ic_color_lens_black_24dp"
+                    android:drawableTint="@color/colorPrimary"
+                    android:layout_weight="1"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:text="Pick a Color"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimary"/>
+
+            </LinearLayout>
+            <TextView
+                android:id="@+id/upload_bnner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/back_white_one__dp"
+                android:layout_weight="1"
+                android:padding="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:text="Upload Image"
+                android:textAlignment="center"
+                android:textColor="@color/colorSecondary"
+                android:textSize="12sp"
+                android:visibility="visible" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginTop="15dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/banner_cancel_txt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/back_white_one__dp"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:layout_weight="1"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:text="CANCEL"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorWhite"/>
+                <TextView
+                    android:id="@+id/banner_ok_txt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/back_white_one__dp"
+                    android:backgroundTint="@color/colorSecondary"
+                    android:layout_weight="1"
+                    android:padding="5dp"
+                    android:layout_margin="5dp"
+                    android:text="OK"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorWhite"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </RelativeLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

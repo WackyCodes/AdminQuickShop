@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/product_details_only_constLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:textSize="16sp"
+        android:text="Product Details"
+        android:textAlignment="viewStart"
+        android:textStyle="bold"
+        android:textColor="@color/colorSecondary"
+        android:background="@color/colorRecyclerBack"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="start" />
+
+    <TextView
+        android:id="@+id/product_details_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:textColor="#000000"
+        android:text="This is very Good product in India. Nokia 1250 is best phone for general purpose. It's a RFID attendance System for School management and colleges. This is very Good product in India. Nokia 1250 is best phone for general purpose. It's a RFID attendance System for School management and colleges.This is very Good product in India. Nokia 1250 is best phone for general purpose. It's a RFID attendance System for School management and colleges.
+This is very Good product in India. Nokia 1250 is best phone for general purpose. It's a RFID attendance System for School management and colleges.
+This is very Good product in India. Nokia 1250 is best phone for general purpose. It's a RFID attendance System for School management and colleges.This is very Good product in India. Nokia 1250 is best phone for general purpose. It's a RFID attendance System for School management and colleges."
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+</androidx.constraintlayout.widget.ConstraintLayout>
