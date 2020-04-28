@@ -42,6 +42,7 @@ import com.example.shailendra.admin.R;
 import com.example.shailendra.admin.StaticMethods;
 import com.example.shailendra.admin.StaticValues;
 import com.example.shailendra.admin.addnewitem.AddNewLayoutActivity;
+import com.example.shailendra.admin.addnewitem.AddNewProductActivity;
 import com.example.shailendra.admin.catlayouts.BannerAndCatModel;
 import com.example.shailendra.admin.catlayouts.BannerItemAdaptor;
 import com.example.shailendra.admin.catlayouts.CatItemAdaptor;
@@ -52,6 +53,7 @@ import com.example.shailendra.admin.productdetails.ProductDetails;
 import com.example.shailendra.admin.update.ViewAllActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.skydoves.colorpickerview.ColorEnvelope;
@@ -73,6 +75,8 @@ import static com.example.shailendra.admin.StaticValues.STRIP_AD_LAYOUT_CONTAINE
 import static com.example.shailendra.admin.StaticValues.VIEW_ALL_FOR_BANNER_PRODUCTS;
 import static com.example.shailendra.admin.StaticValues.VIEW_ALL_FOR_GRID_PRODUCTS;
 import static com.example.shailendra.admin.StaticValues.VIEW_ALL_FOR_HORIZONTAL_PRODUCTS;
+import static com.example.shailendra.admin.StaticValues.tempProductAreaCode;
+import static com.example.shailendra.admin.StaticValues.userCityName;
 import static com.example.shailendra.admin.home.MainFragment.commonCatList;
 
 public class CommonCatAdaptor extends RecyclerView.Adapter {
@@ -302,6 +306,7 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
             visibleBtn = itemView.findViewById( R.id.hrViewVisibilitySwitch );
             editLayoutBtn = itemView.findViewById( R.id.edit_layout_imgView );
             dialog = dialogsClass.progressDialog( itemView.getContext() );
+            visibleBtn.setVisibility( View.INVISIBLE );
         }
         private void setBannerData(final List<BannerAndCatModel> bannerAndCatModelList, final String layoutTitle, final int index){
             layoutPosition = 1 + index;
@@ -327,6 +332,7 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
                     Intent viewAllIntent = new Intent( itemView.getContext(), ViewAllActivity.class);
                     viewAllIntent.putExtra( "LAYOUT_CODE", VIEW_ALL_FOR_BANNER_PRODUCTS );
                     viewAllIntent.putExtra( "CAT_INDEX", catType );
+                    viewAllIntent.putExtra( "CAT_TITLE", catTitle );
                     viewAllIntent.putExtra( "LIST_INDEX", index );
                     viewAllIntent.putExtra( "TITLE", layoutTitle );
                     itemView.getContext().startActivity( viewAllIntent );
@@ -414,6 +420,7 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
             visibleBtn = itemView.findViewById( R.id.hrViewVisibilitySwitch );
             defaultColor = ContextCompat.getColor( itemView.getContext(), R.color.colorGray);
             dialog = dialogsClass.progressDialog( itemView.getContext() );
+            visibleBtn.setVisibility( View.INVISIBLE );
         }
         private void setStripAdData(String imgLink, String colorCode, final int index){
             layoutPosition = 1 + index;
@@ -533,6 +540,7 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
             indexDownBtn = itemView.findViewById( R.id.hrViewDownImgView );
             visibleBtn = itemView.findViewById( R.id.hrViewVisibilitySwitch );
             dialog = dialogsClass.progressDialog( itemView.getContext() );
+            visibleBtn.setVisibility( View.INVISIBLE );
         }
         private void setBannerAdData(String imgLink, String colorCode, final int index){
             layoutPosition = 1 + index;
@@ -639,14 +647,17 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
             editLayoutBtn = itemView.findViewById( R.id.edit_layout_imgView );
             dialog = dialogsClass.progressDialog( itemView.getContext() );
             tempHrGridList = new ArrayList <>();
+            visibleBtn.setVisibility( View.INVISIBLE );
         }
         private void setHrData(final List<String> hrLayoutProductIdList, final String layoutTitle, final List<HrLayoutItemModel> hrProductDetailsList, final int index){
             layoutPosition = 1 + index;
             indexNo.setText( "position : " + layoutPosition );
             headTitle.setText( layoutTitle + " (" + hrLayoutProductIdList.size() + ")" );
+//            String layoutId = commonCatModelList.get( index ).getLayoutID();
 
-            if (hrLayoutProductIdList.size() < 2){
+            if (hrLayoutProductIdList.size() < 3){
                 warningText.setVisibility( View.VISIBLE );
+                warningText.setText( "Add min 3 products to make visible this layout to the customers.!" );
             }else{
                 warningText.setVisibility( View.GONE );
             }
@@ -656,8 +667,9 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
             hrRecycler.setLayoutManager( linearLayoutManager );
 
             if (hrProductDetailsList.size() == 0){
-                hrLayoutItemAdaptor = new HrLayoutItemAdaptor( tempHrGridList, catTitle );
+                hrLayoutItemAdaptor = new HrLayoutItemAdaptor( tempHrGridList, catTitle, catType, index );
                 hrRecycler.setAdapter( hrLayoutItemAdaptor );
+                hrLayoutItemAdaptor.notifyDataSetChanged();
                 if (hrLayoutProductIdList.size() > 6){
                     for (int id_no = 0; id_no < 6; id_no++){
                         loadProductDetailsData(index, hrLayoutProductIdList.get( id_no ));
@@ -669,7 +681,7 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
                 }
             }
             else{
-                hrLayoutItemAdaptor = new HrLayoutItemAdaptor( hrProductDetailsList, catTitle );
+                hrLayoutItemAdaptor = new HrLayoutItemAdaptor( hrProductDetailsList, catTitle, catType, index );
                 hrRecycler.setAdapter( hrLayoutItemAdaptor );
                 hrLayoutItemAdaptor.notifyDataSetChanged();
             }
@@ -691,6 +703,7 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
                         Intent viewAllIntent = new Intent( itemView.getContext(), ViewAllActivity.class);
                         viewAllIntent.putExtra( "LAYOUT_CODE", VIEW_ALL_FOR_HORIZONTAL_PRODUCTS );
                         viewAllIntent.putExtra( "CAT_INDEX", catType ); // passing category index...
+                        viewAllIntent.putExtra( "CAT_TITLE", catTitle );
                         viewAllIntent.putExtra( "LIST_INDEX", index ); //  passing index of current layout inside of category...
                         viewAllIntent.putExtra( "TITLE", layoutTitle ); // passing category title...
                         itemView.getContext().startActivity( viewAllIntent );
@@ -814,9 +827,11 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
             editLayoutBtn = itemView.findViewById( R.id.edit_layout_imgView );
             dialog = dialogsClass.progressDialog( itemView.getContext() );
             tempHrGridList = new ArrayList <>();
+            visibleBtn.setVisibility( View.INVISIBLE );
         }
 
-        private void setDataGridLayout(final List<String> gridLayoutProductIdList, final String gridTitle, final List<HrLayoutItemModel> gridProductDetailsList, final int index){
+        private void setDataGridLayout(final List<String> gridLayoutProductIdList, final String gridTitle, final List<HrLayoutItemModel> gridProductDetailsList
+                ,final int index){
             layoutPosition = 1 + index;
             indexNo.setText( "position : " + layoutPosition );
             gridLayoutTitle.setText( gridTitle + " (" + gridLayoutProductIdList.size() + ")" );
@@ -830,6 +845,7 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
                 gridRange = 3;
                 if (gridLayoutProductIdList.size()<4){
                     warningText.setVisibility( View.VISIBLE );
+                    warningText.setText( "Add min 4 products to make visible this layout to the customers.!" );
                 }else{
                     warningText.setVisibility( View.GONE );
                 }
@@ -871,16 +887,14 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
                     @Override
                     public void onClick(View v) {
                             if ( v == gridLayout.getChildAt( 0 ).findViewById( R.id.product_layout )){
-                                Toast.makeText( itemView.getContext(), "Click at index : "+0, Toast.LENGTH_SHORT ).show();
-
+//                                commonCatList.get( catType ).get( index ).getHrAndGridProductsDetailsList()
+                                addOnProductClick(  gridLayoutProductIdList.get( 0 ), itemView.getContext(), index );
                             } else
                                 if ( v == gridLayout.getChildAt( 1 ).findViewById( R.id.product_layout )){
-                                Toast.makeText( itemView.getContext(), "Click at index : "+1, Toast.LENGTH_SHORT ).show();
-
+                                    addOnProductClick(  gridLayoutProductIdList.get( 1 ), itemView.getContext(), index );
                             } else
                                 if ( v == gridLayout.getChildAt( 2 ).findViewById( R.id.product_layout )){
-                                Toast.makeText( itemView.getContext(), "Click at index : "+2, Toast.LENGTH_SHORT ).show();
-
+                                    addOnProductClick(  gridLayoutProductIdList.get( 2 ), itemView.getContext(), index );
                             }
                     }
                 } );
@@ -902,20 +916,16 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
                     @Override
                     public void onClick(View v) {
                         if ( v == gridLayout.getChildAt( 0 ).findViewById( R.id.add_new_item_Linearlayout )){
-                            Toast.makeText( itemView.getContext(), "Click at index : "+0, Toast.LENGTH_SHORT ).show();
-
+                            addNewItem( index, 0 );
                         } else
                         if ( v == gridLayout.getChildAt( 1 ).findViewById( R.id.add_new_item_Linearlayout )){
-                            Toast.makeText( itemView.getContext(), "Click at index : "+1, Toast.LENGTH_SHORT ).show();
-
+                            addNewItem( index, 1 );
                         } else
                         if ( v == gridLayout.getChildAt( 2 ).findViewById( R.id.add_new_item_Linearlayout )){
-                            Toast.makeText( itemView.getContext(), "Click at index : "+2, Toast.LENGTH_SHORT ).show();
-
+                            addNewItem( index, 2 );
                         } else
                         if ( v == gridLayout.getChildAt( 3 ).findViewById( R.id.add_new_item_Linearlayout )){
-                            Toast.makeText( itemView.getContext(), "Click at index : "+3, Toast.LENGTH_SHORT ).show();
-
+                            addNewItem( index, 3 );
                         }
                     }
                 } );
@@ -936,6 +946,7 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
                     Intent viewAllIntent = new Intent( itemView.getContext(), ViewAllActivity.class);
                     viewAllIntent.putExtra( "LAYOUT_CODE",VIEW_ALL_FOR_GRID_PRODUCTS );
                     viewAllIntent.putExtra( "CAT_INDEX", catType );
+                    viewAllIntent.putExtra( "CAT_TITLE", catTitle );
                     viewAllIntent.putExtra( "LIST_INDEX", index );
                     viewAllIntent.putExtra( "TITLE", gridTitle );
                     itemView.getContext().startActivity( viewAllIntent );
@@ -997,43 +1008,58 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
             } );
 
         }
-
-        private void setProductData(final int i, final int index, final String productId){
+        private void setProductData(final int pos, final int index, final String productId){
             firebaseFirestore.collection( "PRODUCTS" ).document( productId )
                     .get().addOnCompleteListener( new OnCompleteListener <DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task <DocumentSnapshot> task) {
                     if (task.isSuccessful()){
+
+                        String pImgLink = task.getResult().get( "product_image_1").toString();
+                        String pName = task.getResult().get( "product_full_name" ).toString();
+                        String pPrice = task.getResult().get( "product_price" ).toString();
+                        String pMrpPrice = task.getResult().get( "product_cut_price" ).toString();
+                        long pStock = (long) task.getResult().get( "product_stocks" );
+                        Boolean pCod = (Boolean) task.getResult().get( "product_cod" );
+
                         // access the banners from database...
                         tempHrGridList.add( new HrLayoutItemModel( productId
-                                , task.getResult().get( "product_image_1").toString()
-                                , task.getResult().get( "product_full_name" ).toString()
-                                , task.getResult().get( "product_price" ).toString()
-                                , task.getResult().get( "product_cut_price" ).toString()
-                                , (long) task.getResult().get( "product_stocks" )
-                                , (Boolean) task.getResult().get( "product_cod" ) ) );
+                                , pImgLink
+                                , pName
+                                , pPrice
+                                , pMrpPrice
+                                , pStock
+                                , pCod ));
 
                         commonCatModelList.get( index ).setHrAndGridProductsDetailsList( tempHrGridList );
+                        temp = pos;
 
-                        ConstraintLayout itemLayout = gridLayout.getChildAt( i ).findViewById( R.id.product_layout );
-                        gridLayout.getChildAt( i ).findViewById( R.id.add_new_item_Linearlayout ).setVisibility( View.GONE );
+
+                        ConstraintLayout itemLayout = gridLayout.getChildAt( pos ).findViewById( R.id.product_layout );
                         itemLayout.setVisibility( View.VISIBLE );
+                        gridLayout.getChildAt( pos ).findViewById( R.id.add_new_item_Linearlayout ).setVisibility( View.GONE );
 
-                        ImageView img = gridLayout.getChildAt( i ).findViewById( R.id.hr_product_image );
-                        TextView name = gridLayout.getChildAt( i ).findViewById( R.id.hr_product_name );
-                        TextView price = gridLayout.getChildAt( i ).findViewById( R.id.hr_product_price );
-                        TextView cutPrice = gridLayout.getChildAt( i ).findViewById( R.id.hr_product_cut_price );
-                        TextView perOffText = gridLayout.getChildAt( i ).findViewById( R.id.hr_off_percentage );
+                        ImageView img = gridLayout.getChildAt( temp ).findViewById( R.id.hr_product_image );
+                        TextView name = gridLayout.getChildAt( temp ).findViewById( R.id.hr_product_name );
+                        TextView price = gridLayout.getChildAt( temp ).findViewById( R.id.hr_product_price );
+                        TextView cutPrice = gridLayout.getChildAt( temp ).findViewById( R.id.hr_product_cut_price );
+                        TextView perOffText = gridLayout.getChildAt( temp ).findViewById( R.id.hr_off_percentage );
+                        TextView stockText = gridLayout.getChildAt( temp ).findViewById( R.id.stock_text );
 
-                        name.setText( tempHrGridList.get( i ).getHrProductName() );
-                        price.setText("Rs." + tempHrGridList.get( i ).getHrProductPrice() +"/-" );
-                        cutPrice.setText( "Rs."+ tempHrGridList.get( i ).getHrProductCutPrice() +"/-" );
+                        name.setText( pName );
+                        price.setText("Rs." + pPrice +"/-" );
+                        cutPrice.setText( "Rs."+ pMrpPrice +"/-" );
+                        if (pStock > 0){
+                            stockText.setText("In Stock (" + pStock + ")");
+                        }else{
+                            stockText.setText( "Out Of Stock" );
+                        }
                         // Set img resource
-                        Glide.with( itemView.getContext() ).load( tempHrGridList.get( i ).getHrProductImage()  )
+                        Glide.with( itemView.getContext() ).load( pImgLink )
                                 .apply( new RequestOptions().placeholder( R.drawable.square_placeholder ) ).into( img );
 
-                        int mrp =  Integer.parseInt( tempHrGridList.get( i ).getHrProductCutPrice());
-                        int showPrice = Integer.parseInt(  tempHrGridList.get( i ).getHrProductPrice());
+                        int mrp =  Integer.parseInt( pMrpPrice );
+                        int showPrice = Integer.parseInt( pPrice );
                         int perOff = (( mrp - showPrice )*100)/showPrice;
                         perOffText.setText( perOff +"% Off" );
                     }
@@ -1047,19 +1073,73 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
 
 
         }
+        private void addOnProductClick(String productId, Context context, int index){
+
+            StaticValues.UPDATE_P_LAY_INDEX = index;
+            StaticValues.UPDATE_P_CAT_INDEX = catType;
+            StaticValues.UPDATE_PRODUCT_CAT = catTitle;
+
+            Intent productDetailIntent = new Intent( context, ProductDetails.class );
+            productDetailIntent.putExtra( "PRODUCT_ID", productId );
+            context.startActivity( productDetailIntent );
+
+        }
+        private void addNewItem(final int layIndex, int listIndex){
+            Map <String, Object> newProductMap = new HashMap <>();
+            /** Is_Update :
+             1. N - Created Product but Not add details yet.!
+             2. Y - Added Details and Update...
+             3. V - Visible to search...
+             4. I - InVisible : Stop from searching etc...
+             */
+            newProductMap.put( "a_is_update", "N" );
+            newProductMap.put( "a_no_of_uses", 0 );
+            newProductMap.put( "a_product_cat", catTitle );
+
+            final Dialog dialog = new DialogsClass().progressDialog( itemView.getContext() );
+            dialog.show();
+            FirebaseFirestore.getInstance().collection( "PRODUCTS" ).add( newProductMap )
+                    .addOnCompleteListener( new OnCompleteListener <DocumentReference>() {
+                        @Override
+                        public void onComplete(@NonNull Task <DocumentReference> task) {
+                            if (task.isSuccessful()){
+                                // Shift to add product details...
+                                String docId = task.getResult().getId();
+                                Toast.makeText( itemView.getContext(), "Product Id : "+docId, Toast.LENGTH_SHORT ).show();
+
+                                Intent gotoAddProductIntent = new Intent(itemView.getContext(), AddNewProductActivity.class );
+                                gotoAddProductIntent.putExtra( "PRODUCT_ID", docId );
+                                gotoAddProductIntent.putExtra( "LAY_INDEX", layIndex );
+                                gotoAddProductIntent.putExtra( "CAT_INDEX", catType );
+                                gotoAddProductIntent.putExtra( "PRODUCT_CAT", catTitle );
+                                gotoAddProductIntent.putExtra( "UPDATE", false );
+                                itemView.getContext().startActivity( gotoAddProductIntent );
+                            }else{
+                                // Show Toast..  to try again...
+                                Toast.makeText( itemView.getContext(), "Creating New Product Id Failed..! Please Try Again.!", Toast.LENGTH_SHORT ).show();
+                            }
+                            dialog.dismiss();
+                        }
+                    } );
+        }
 
     }
     //==============  GridProduct Grid Layout View Holder =================
 
-    //                          _________________________________________
+    //                            _________________________________________
     /*___________________________ Others Methods to Updates the Layouts ____________________________*/
 
     private void setIndexUpDownVisibility( int index, ImageView indexUpBtn,  ImageView indexDownBtn){
-        indexUpBtn.setVisibility( View.VISIBLE );
-        indexDownBtn.setVisibility( View.VISIBLE );
-        if (index == 0){
+        if (commonCatModelList.size()>1){
+            indexUpBtn.setVisibility( View.VISIBLE );
+            indexDownBtn.setVisibility( View.VISIBLE );
+            if (index == 0){
+                indexUpBtn.setVisibility( View.INVISIBLE );
+            }else if (index == commonCatModelList.size()-1){
+                indexDownBtn.setVisibility( View.INVISIBLE );
+            }
+        }else{
             indexUpBtn.setVisibility( View.INVISIBLE );
-        }else if (index == commonCatModelList.size()-1){
             indexDownBtn.setVisibility( View.INVISIBLE );
         }
     }
@@ -1095,14 +1175,20 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
 
     }
     private void updateOnDocument(final Dialog dialog, String layoutId, Map <String, Object> updateMap){
-        firebaseFirestore.collection( "CATEGORIES" ).document( catTitle.toUpperCase() )
-                .collection( "LAYOUTS" ).document( layoutId ).update( updateMap )
-                .addOnCompleteListener( new OnCompleteListener <Void>() {
-            @Override
-            public void onComplete(@NonNull Task <Void> task) {
-                dialog.dismiss();
-            }
-        } );
+
+        if ( userCityName != null && tempProductAreaCode != null){
+            StaticValues.getFirebaseDocumentReference( userCityName, tempProductAreaCode )
+                    .collection( "CATEGORIES" ).document( catTitle.toUpperCase() )
+                    .collection( "LAYOUTS" ).document( layoutId ).update( updateMap )
+                    .addOnCompleteListener( new OnCompleteListener <Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task <Void> task) {
+                            dialog.dismiss();
+                        }
+                    } );
+        }else{
+            dialog.dismiss();
+        }
     }
 
     private void showToast(String msg, Context context){
@@ -1170,10 +1256,8 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
                         break;
                 }
                 popupWindow.dismiss();
-
             }
         } );
-
         // some other visual settings
         popupWindow.setFocusable(true);
         popupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
@@ -1196,23 +1280,31 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
                 final Dialog pDialog = dialogsClass.progressDialog( context );
                 pDialog.show();
                 // Query to delete the Layout...!
-                firebaseFirestore.collection( "CATEGORIES" ).document( catTitle.toUpperCase() )
-                        .collection( "LAYOUTS" ).document( layoutId ).delete()
-                        .addOnCompleteListener( new OnCompleteListener <Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task <Void> task) {
-                        if (task.isSuccessful()){
-                            showToast( "Deleted Layout Successfully.!", context );
-                             // : Update in local list..!
-                            commonCatModelList.remove( index );
-                            commonCatList.set( catType, commonCatModelList );
-                            CommonCatActivity.commonCatAdaptor.notifyDataSetChanged();
-                        }else {
-                            showToast( "Failed.! Something went wrong.!", context );
-                        }
-                        pDialog.dismiss();
-                    }
-                } );
+
+                if ( userCityName != null && tempProductAreaCode != null){
+                    StaticValues.getFirebaseDocumentReference( userCityName, tempProductAreaCode )
+                            .collection( "CATEGORIES" ).document( catTitle.toUpperCase() )
+                            .collection( "LAYOUTS" ).document( layoutId ).delete()
+                            .addOnCompleteListener( new OnCompleteListener <Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task <Void> task) {
+                                    if (task.isSuccessful()){
+                                        showToast( "Deleted Layout Successfully.!", context );
+                                        // : Update in local list..!
+                                        commonCatModelList.remove( index );
+                                        commonCatList.set( catType, commonCatModelList );
+                                        CommonCatActivity.commonCatAdaptor.notifyDataSetChanged();
+                                    }else {
+                                        showToast( "Failed.! Something went wrong.!", context );
+                                    }
+                                    pDialog.dismiss();
+                                }
+                            } );
+                }else{
+                    showToast( "Failed.!", context );
+                    pDialog.dismiss();
+                }
+
             }
         } );
         alertD.setNegativeButton( "Cancel", new DialogInterface.OnClickListener() {
@@ -1280,4 +1372,8 @@ public class CommonCatAdaptor extends RecyclerView.Adapter {
 
     }
 
+
 }
+
+// WackyCodes - (Shailendra Lodhi) ... //
+

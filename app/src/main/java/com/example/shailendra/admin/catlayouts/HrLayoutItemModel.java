@@ -10,7 +10,8 @@ public class HrLayoutItemModel {
     private long hrStockInfo;
     private Boolean hrCodInfo;
 
-    public HrLayoutItemModel(String hrProductId, String hrProductImage, String hrProductName, String hrProductPrice, String hrProductCutPrice, long hrStockInfo, Boolean hrCodInfo) {
+    public HrLayoutItemModel(String hrProductId, String hrProductImage, String hrProductName, String hrProductPrice,
+                             String hrProductCutPrice, long hrStockInfo, Boolean hrCodInfo) {
         this.hrProductId = hrProductId;
         this.hrProductImage = hrProductImage;
         this.hrProductName = hrProductName;

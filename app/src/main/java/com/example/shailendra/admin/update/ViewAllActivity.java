@@ -31,11 +31,10 @@ import static com.example.shailendra.admin.StaticValues.VIEW_ALL_FOR_GRID_PRODUC
 import static com.example.shailendra.admin.StaticValues.VIEW_ALL_FOR_HORIZONTAL_PRODUCTS;
 import static com.example.shailendra.admin.home.MainFragment.commonCatList;
 
-
 public class ViewAllActivity extends AppCompatActivity {
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
-    private  RecyclerView recyclerProductLayout;
+    private RecyclerView recyclerProductLayout;
     private GridView gridProductLayout;
     public static List <String> totalProductsIdViewAll;
     public static List <HrLayoutItemModel> horizontalItemViewModelListViewAll;
@@ -45,10 +44,11 @@ public class ViewAllActivity extends AppCompatActivity {
     private List<Integer> layoutIndexList = new ArrayList <>();
 
     int catIndex;
+    String catTitle;
     int listIndex;
     int layoutCode;
     String layoutId;
-    private HorizontalViewAllAdaptor horizontalItemViewAdaptor;
+    public static HorizontalViewAllAdaptor horizontalItemViewAdaptor;
     private GridViewAllAdaptor gridViewAllAdaptor;
 
     DialogsClass dialogsClass = new DialogsClass( );
@@ -68,8 +68,10 @@ public class ViewAllActivity extends AppCompatActivity {
         }catch (NullPointerException ignored){ }
 
         layoutCode = getIntent().getIntExtra( "LAYOUT_CODE", -1 );  // get layout code...
+//        layoutIndex = getIntent().getIntExtra( "LAYOUT_INDEX", -1 );  // get layout code...
         catIndex = getIntent().getIntExtra( "CAT_INDEX", -1 ); // getting category index...
         listIndex = getIntent().getIntExtra( "LIST_INDEX", -1 ); //  getting index of current layout inside of category...
+        catTitle = getIntent().getStringExtra( "CAT_TITLE" );
 
 //        viewAllIntent.putExtra( "TITLE", layoutTitle ); // passing category title...
 
@@ -121,17 +123,40 @@ public class ViewAllActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // To Refresh Menu...
+        invalidateOptionsMenu();
+        if (layoutCode == VIEW_ALL_FOR_HORIZONTAL_PRODUCTS){
+            horizontalItemViewAdaptor.notifyDataSetChanged();
+        }
+        if (layoutCode == VIEW_ALL_FOR_GRID_PRODUCTS){
+            gridViewAllAdaptor.notifyDataSetChanged();
+        }
+//        if (layoutCode == VIEW_ALL_FOR_BANNER_PRODUCTS){
+//            // Notify if updated banner...
+//        }
+    }
+
+
     private void setRecyclerProductLayout(){
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager( this );
         linearLayoutManager.setOrientation( RecyclerView.VERTICAL );
         recyclerProductLayout.setLayoutManager( linearLayoutManager );
-        horizontalItemViewAdaptor = new HorizontalViewAllAdaptor( horizontalItemViewModelListViewAll, layoutIdList, layoutIndexList, layoutId, catIndex );
+        horizontalItemViewAdaptor = new HorizontalViewAllAdaptor( horizontalItemViewModelListViewAll, layoutIndexList, layoutId, listIndex, catIndex, catTitle );
         recyclerProductLayout.setAdapter( horizontalItemViewAdaptor );
         horizontalItemViewAdaptor.notifyDataSetChanged();
     }
 
     private void setGridProductLayout(){
-        gridViewAllAdaptor = new GridViewAllAdaptor( gridViewModelListViewAll );
+        gridViewAllAdaptor = new GridViewAllAdaptor( gridViewModelListViewAll, listIndex, catIndex, catTitle );
         gridProductLayout.setAdapter( gridViewAllAdaptor );
         gridViewAllAdaptor.notifyDataSetChanged();
     }
@@ -191,7 +216,6 @@ public class ViewAllActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
 //        getMenuInflater().inflate( R.menu.menu_show_in_product_details,menu);
         // Check First whether any item in cart or not...
-
         return true;
     }
 
@@ -206,18 +230,6 @@ public class ViewAllActivity extends AppCompatActivity {
         return super.onOptionsItemSelected( item );
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // To Refresh Menu...
-        invalidateOptionsMenu();
-    }
 
 }
 

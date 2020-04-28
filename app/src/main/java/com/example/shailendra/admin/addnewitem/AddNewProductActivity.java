@@ -1,7 +1,9 @@
 package com.example.shailendra.admin.addnewitem;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -24,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -39,10 +42,17 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.shailendra.admin.DialogsClass;
 import com.example.shailendra.admin.R;
+import com.example.shailendra.admin.StaticValues;
+import com.example.shailendra.admin.catlayouts.HrLayoutItemModel;
+import com.example.shailendra.admin.database.UpdateImages;
+import com.example.shailendra.admin.productdetails.ProductDetailsDescriptionAdaptor;
+import com.example.shailendra.admin.productdetails.ProductDetailsImagesAdapter;
+import com.example.shailendra.admin.productdetails.ProductDetailsSpecificationModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnPausedListener;
@@ -50,6 +60,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.SyncFailedException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +68,9 @@ import java.util.Map;
 
 import static com.example.shailendra.admin.StaticValues.GALLERY_CODE;
 import static com.example.shailendra.admin.StaticValues.READ_EXTERNAL_MEMORY_CODE;
+import static com.example.shailendra.admin.StaticValues.tempProductAreaCode;
+import static com.example.shailendra.admin.StaticValues.userCityName;
+import static com.example.shailendra.admin.home.MainFragment.commonCatList;
 
 public class AddNewProductActivity extends AppCompatActivity {
 
@@ -82,9 +96,9 @@ public class AddNewProductActivity extends AppCompatActivity {
     private Spinner newProMainImageSpin; // new_pro_main_image_spinner
     private Button newProUploadImageBtn; // new_prod_upload_images_btn
 
-    public AddImageAdaptor imgAdaptor = new AddImageAdaptor();
-    public static List<String> productImageSelectList = new ArrayList <>();
-    public static List<UploadImageDataModel> uploadImageDataModelList = new ArrayList <>();
+    public AddImageAdaptor imgAdaptor;
+    public static List<String> productImageSelectList;
+    public static List<UploadImageDataModel> uploadImageDataModelList;
 
     public ArrayAdapter <String> dataAdapter;
 
@@ -97,6 +111,7 @@ public class AddNewProductActivity extends AppCompatActivity {
     private TextView newProPerDiscount; // new_pro_per_discount
     private TextView newProRsDiscount; // new_pro_rs_discount
     private EditText newProStockAvailable; // new_pro_stock_available
+    private Spinner  newProQtyTypeText;
     private Switch   newProCodSwitch; // new_pro_cod_switch
 
 //            <!-- Section 3: Add Descriptions and Specifications...-->
@@ -127,7 +142,12 @@ public class AddNewProductActivity extends AppCompatActivity {
     private boolean isUploadImages = false;
     private String uploadProductID;
     private String productCat;
+    private int catIndex;
+    private int layIndex;
+    private String qtyTypeText = null;
 
+    //    private DocumentSnapshot documentSnapshot;
+    private boolean isUpdateRequest = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -138,6 +158,9 @@ public class AddNewProductActivity extends AppCompatActivity {
 
         uploadProductID = getIntent().getStringExtra( "PRODUCT_ID" );
         productCat = getIntent().getStringExtra( "PRODUCT_CAT" );
+        catIndex = getIntent().getIntExtra( "CAT_INDEX", -1 );
+        layIndex = getIntent().getIntExtra( "LAY_INDEX", -1 );
+        isUpdateRequest = getIntent().getBooleanExtra( "UPDATE", false );
 
 //            <!--    Section 1: Add Images..-->
         secAddImageLayout = findViewById( R.id.sec_1_add_image_layout );
@@ -153,6 +176,7 @@ public class AddNewProductActivity extends AppCompatActivity {
         newProPerDiscount = findViewById( R.id.new_pro_per_discount );
         newProRsDiscount = findViewById( R.id.new_pro_rs_discount );
         newProStockAvailable = findViewById( R.id.new_pro_stock_available );
+        newProQtyTypeText = findViewById( R.id.new_pro_qty_type );
         newProCodSwitch = findViewById( R.id.new_pro_cod_switch );
 //            <!-- Section 3: Add Descriptions and Specifications...-->
         secAddDesSpecifyLayout = findViewById( R.id.sec_3_add_des_specific_layout );
@@ -167,6 +191,11 @@ public class AddNewProductActivity extends AppCompatActivity {
         newProSubmitBtn = findViewById( R.id.new_pro_upload_btn );
 
         //------------------------------------------------------------------------------------
+
+         imgAdaptor = new AddImageAdaptor();
+         productImageSelectList = new ArrayList <>();
+         uploadImageDataModelList = new ArrayList <>();
+
         // Add Image Recycler....
         LinearLayoutManager imgLayoutManager = new LinearLayoutManager( this );
         imgLayoutManager.setOrientation( RecyclerView.HORIZONTAL );
@@ -180,6 +209,7 @@ public class AddNewProductActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (productImageSelectList.size() - 1 == uploadImageDataModelList.size()){
                     if (productImageSelectList.size() > 1 ){
+                        isUploadImages = true;
                         showToast( "Upload Successfully..! Please add new Image to upload again.!");
                     }else{
                         showToast( "Please add Images first.!!" );
@@ -192,7 +222,9 @@ public class AddNewProductActivity extends AppCompatActivity {
         } );
 
         //----------- Spinner...
-        productImageSelectList.add( "Select Image" );
+        if(productImageSelectList.size() == 0){
+            productImageSelectList.add( "Select Image" );
+        }
         dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, productImageSelectList);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -217,6 +249,23 @@ public class AddNewProductActivity extends AppCompatActivity {
             }
         } );
 
+        // Qty Type Text Adopter...
+        ArrayAdapter<String> qtyTypeList = new ArrayAdapter<String>( this,
+                android.R.layout.simple_spinner_item, getResources().getStringArray( R.array.qty_auto_text_list ) );
+        newProQtyTypeText.setAdapter( qtyTypeList );
+        newProQtyTypeText.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView <?> parent, View view, int position, long id) {
+                if (position > 0){
+                    qtyTypeText = parent.getItemAtPosition( position ).toString();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView <?> parent) {
+                qtyTypeText = null;
+            }
+        } );
         // ------------  Sec 2 -- Text Watcher...
         priceAndDiscountTextWatcher();
 
@@ -237,8 +286,179 @@ public class AddNewProductActivity extends AppCompatActivity {
                 }
             }
         } );
+
+        dialog.show();
+        if (isUpdateRequest){
+            loadProductDetails( uploadProductID );
+        }else{
+            dialog.dismiss();
+        }
+
     }
     // End of onCreate method.....
+
+    private void loadProductDetails( String productID){
+        // Retrieve details from database...----------------
+        if (!productID.isEmpty()){
+            firebaseFirestore.collection( "PRODUCTS" ).document( productID )
+                    .get().addOnCompleteListener( new OnCompleteListener <DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task <DocumentSnapshot> task) {
+
+                    if (task.isSuccessful()){
+
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        // --- add Product Images...
+                        for (long x = 1; x < (long)documentSnapshot.get( "product_image_num" )+1; x++){
+                            uploadImageDataModelList.add( new UploadImageDataModel( documentSnapshot.get( "product_image_"+x ).toString(), "") );
+                            productImageSelectList.add( "Image "+ x );
+                            imgAdaptor.notifyDataSetChanged();
+                        }
+                        // Set other Details of  Product Details Image Layout.
+                        // Product Name...
+                        newProFullName.setText( documentSnapshot.get( "product_full_name" ).toString() );
+                        newProdShortName.setText( documentSnapshot.get( "product_short_name" ).toString() );
+                        //add name in Temp List
+                        // Product Price...
+                        newProSellingPrice.setText( documentSnapshot.get( "product_price" ).toString() );
+                        // add price in  Temp List
+                        // Product Cut Price...
+                        newProMrpRate.setText( documentSnapshot.get( "product_cut_price" ).toString() );
+                        //add cut price in  Temp List
+//                        tOffPer = documentSnapshot.get( "product_off_per" ).toString();
+//                        productOffPer.setText( tOffPer + "% OFF" );
+
+                        if ((boolean)documentSnapshot.get( "product_cod" )){
+                            newProCodSwitch.setChecked( true );
+                        }else{
+                            newProCodSwitch.setChecked( false );
+                        }
+                        newProStockAvailable.setText( String.valueOf( (long)documentSnapshot.get( "product_stocks" ) ) );
+
+                        // Set other Details of  Product Details Image Layout.
+                        if ((boolean)documentSnapshot.get( "use_tab_layout" )){
+                            useTabLayoutSwitch.setChecked( true );
+                            // use tab layout...
+                            secAddDesSpecifyLayout.setVisibility( View.VISIBLE );
+                            // TODO : set Description data..
+                            newProDescription.setText( documentSnapshot.get( "product_description" ).toString() );
+                            // TODO : set Specification data...
+                            for (long x = 1; x < (long) documentSnapshot.get( "pro_sp_head_num" )+1; x++){
+                                specificationFeatureModelList = new ArrayList <>();
+                                for (long i = 1; i < (long)documentSnapshot.get( "pro_sp_sub_head_"+x+"_num" )+1; i++){
+                                    specificationFeatureModelList.add( new AddSpecificationFeatureModel(
+                                            documentSnapshot.get( "pro_sp_sub_head_" + x + i ).toString(),
+                                            documentSnapshot.get( "pro_sp_sub_head_d_" + x + i ).toString() ) );
+                                }
+                                specificationModelList.add( new AddSpecificationModel( documentSnapshot.get( "pro_sp_head_" + x ).toString(),
+                                        specificationFeatureModelList ) );
+
+                                addSpecificationAdaptor.notifyDataSetChanged();
+                                addSpecificationFeatureAdaptor.notifyDataSetChanged();
+                            }
+                        }
+                        else{
+                            // don't use tabLayout...
+                            useTabLayoutSwitch.setChecked( false );
+                            secAddDesSpecifyLayout.setVisibility( View.GONE );
+                        }
+                        newProDetails.setText( documentSnapshot.get( "product_details" ).toString() );
+                        // check offline wishList Size.. and run DB query to update wishList if size is 0
+                        /**  if (currentUser != null){
+
+                         // for Wish list...
+                         if (DBquery.myWishList.size() == 0){
+                         DBquery.wishListQuery(ProductDetails.this, dialog, false);
+                         }
+                         // set color of wishList button based on wishList...
+                         if (DBquery.myWishList.size() != 0){
+                         if (DBquery.myWishList.contains( productID )){
+                         ALREADY_ADDED_IN_WISHLIST = true;
+                         addToWishListBtn.setSupportImageTintList( getResources().getColorStateList( R.color.colorRed ) );
+                         }else{
+                         ALREADY_ADDED_IN_WISHLIST = false;
+                         }
+                         dialog.dismiss();
+                         }
+
+                         // for cart list...
+                         if (DBquery.myCartCheckList.size() == 0){
+                         DBquery.cartListQuery(ProductDetails.this, false, dialog, PRODUCT_DETAILS_ACTIVITY);
+                         }
+                         if (DBquery.myCartCheckList.size() != 0){
+                         for (int i = 0; i < DBquery.myCartCheckList.size(); i++) {
+                         if( DBquery.myCartCheckList.get( i ).getProductId().equals( productID )){
+                         ALREADY_ADDED_IN_CART = true;
+                         break;
+                         }else{
+                         ALREADY_ADDED_IN_CART = false;
+                         }
+                         }
+                         dialog.dismiss();
+                         }
+
+                         }else {
+                         dialog.dismiss();
+                         } **/
+
+                        dialog.dismiss();
+                    }
+                    else{
+                        String error = task.getException().getMessage();
+                        showToast(error);
+                        dialog.dismiss();
+                    }
+                }
+            } );
+        }
+        else{
+            showToast("Product ID not found..!");
+            dialog.dismiss();
+            finish();
+        }
+        // Retrieve details from database...----------------
+    }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+
+        if (isUpdateRequest){
+            super.onBackPressed();
+        }else{
+            AlertDialog.Builder builder = new AlertDialog.Builder( this );
+            builder.setTitle( "Cancel adding Product.?" );
+            builder.setCancelable( false );
+            builder.setPositiveButton( "YES", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogA, int which) {
+                    dialogA.dismiss();
+                    dialog.show();
+                    FirebaseFirestore.getInstance().collection( "PRODUCTS" ).document( uploadProductID )
+                            .delete().addOnCompleteListener( new OnCompleteListener <Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task <Void> task) {
+                            if (task.isSuccessful()){
+                                dialog.dismiss();
+                                finish();
+                            }else{
+                                dialog.dismiss();
+                                showToast( "Failed to delete Product ID.! Please Clean Garbage Data.!" );
+                                finish();
+                            }
+                        }
+                    } );
+                }
+            } ).setNegativeButton( "NO", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogA, int which) {
+                    dialogA.dismiss();
+                }
+            } ).show();
+
+        }
+
+    }
 
     private void priceAndDiscountTextWatcher(){
         newProMrpRate.addTextChangedListener( new TextWatcher() {
@@ -383,7 +603,8 @@ public class AddNewProductActivity extends AppCompatActivity {
     }
 
     // Validation For section 2...
-    private boolean isValidFieldsData(){
+    private boolean isValidFieldsData()
+    {
         if (uploadImageDataModelList.size() == 0){
             dialog.dismiss();
             dialogsClass.alertDialog( this, null, "Add Product Images..!", null ).show();
@@ -405,6 +626,11 @@ public class AddNewProductActivity extends AppCompatActivity {
             if (mainImageLink == null){
                 dialog.dismiss();
                 dialogsClass.alertDialog( this, null, "Select Main Image..!", null ).show();
+                return false;
+            }
+            if (qtyTypeText == null){
+                dialog.dismiss();
+                dialogsClass.alertDialog( this, null, "Select Quantity Type..!", null ).show();
                 return false;
             }
 //            uploadImageDataModelList.size()
@@ -618,6 +844,7 @@ public class AddNewProductActivity extends AppCompatActivity {
         updateMap.put( "a_is_update", "Y" );
         updateMap.put( "a_no_of_uses", 0 );
         updateMap.put( "a_product_cat", productCat );
+        updateMap.put( "area_code", tempProductAreaCode );
         // Primary - fields..
         updateMap.put( "product_full_name", newProFullName.getText().toString() );
         updateMap.put( "product_short_name", newProdShortName.getText().toString() );
@@ -628,6 +855,7 @@ public class AddNewProductActivity extends AppCompatActivity {
 
         updateMap.put( "product_stocks", Integer.parseInt( newProStockAvailable.getText().toString() ) );
 //        updateMap.put( "product_quantity", .getText().toString() );
+        updateMap.put( "product_qty_type", qtyTypeText );
         updateMap.put( "product_details", newProDetails.getText().toString() );
         if (newProCodSwitch.isChecked()){
             updateMap.put( "product_cod", true );
@@ -670,20 +898,69 @@ public class AddNewProductActivity extends AppCompatActivity {
             updateMap.put( "use_tab_layout", false );
         }
 
+
         firebaseFirestore.collection( "PRODUCTS" ).document( uploadProductID ).set( updateMap )
                 .addOnCompleteListener( new OnCompleteListener <Void>() {
             @Override
             public void onComplete(@NonNull Task <Void> task) {
                 if (task.isSuccessful()){
-                    dialog.dismiss();
-                    showToast( "Product Added Successfully..!" );
-                    finish();
+//                    dialog.dismiss();
+                    // add in Local List...
+                    if (isUpdateRequest){
+                        dialog.dismiss();
+                        showToast( "Update Product Successfully..!" );
+                        finish();
+                    }else{
+                        HrLayoutItemModel hrLayoutItemModel = new HrLayoutItemModel( uploadProductID, mainImageLink,
+                                newProFullName.getText().toString(), newProSellingPrice.getText().toString().trim(),
+                                newProMrpRate.getText().toString().trim(), Long.parseLong( newProStockAvailable.getText().toString() ), true);
+
+                        requestUpdateInCatData(dialog, hrLayoutItemModel);
+                    }
                 }else{
                     dialog.dismiss();
                     showToast( "Failed to Add Product..!" );
                 }
             }
         } );
+    }
+
+    private List<String> productIdList = new ArrayList <>();
+    private void requestUpdateInCatData(final Dialog dialog, final HrLayoutItemModel hrLayoutItemModel ){
+        String docId = commonCatList.get( catIndex ).get( layIndex ).getLayoutID();
+        productIdList = commonCatList.get( catIndex ).get( layIndex ).getHrAndGridLayoutProductIdList();
+        productIdList.add( uploadProductID );
+
+        Map <String, Object> layoutMap = new HashMap <>();
+        layoutMap.put( "no_of_products", productIdList.size() );
+
+        for (int i = 0; i < productIdList.size(); i++ ){
+            layoutMap.put( "product_id_"+(1+i), productIdList.get( i ) );
+        }
+        if ( userCityName != null && tempProductAreaCode != null){
+            StaticValues.getFirebaseDocumentReference( userCityName, tempProductAreaCode )
+                    .collection( "CATEGORIES" ).document( productCat.toUpperCase() )
+                    .collection( "LAYOUTS" ).document( docId ).update( layoutMap )
+                    .addOnCompleteListener( new OnCompleteListener <Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task <Void> task) {
+                            if (task.isSuccessful()){
+                                commonCatList.get( catIndex ).get( layIndex ).setHrAndGridLayoutProductIdList( productIdList );
+                                commonCatList.get( catIndex ).get( layIndex ).getHrAndGridProductsDetailsList().add( hrLayoutItemModel );
+                                dialog.dismiss();
+                                showToast( "Product Added Successfully..!" );
+                                finish();
+                            }else{
+                                dialog.dismiss();
+                                showToast( "Failed..! Something Went Wrong.!" );
+                            }
+                        }
+                    } );
+        }else{
+            dialog.dismiss();
+        }
+
+
     }
 
     // --------------- Upload Data on Database.. ---------------------------------------------------

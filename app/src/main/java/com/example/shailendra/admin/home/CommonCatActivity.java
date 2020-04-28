@@ -131,6 +131,14 @@ public class CommonCatActivity extends AppCompatActivity implements View.OnClick
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (commonCatAdaptor != null){
+            commonCatAdaptor.notifyDataSetChanged();
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if ((id == android.R.id.home)) {

@@ -49,7 +49,8 @@ public class UpdateImages {
     static StorageReference storageReference = FirebaseStorage.getInstance().getReference();
 
 
-    public static void uploadImageOnFirebaseStorage(final Context context, final Dialog dialog, final Uri imageUri, final ImageView imageView, final String uploadPath, final String fileName){
+    public static void uploadImageOnFirebaseStorage(final Context context, final Dialog dialog, final Uri imageUri,
+                                                    final ImageView imageView, final String uploadPath, final String fileName){
         uploadImageLink = "";
         isUploadSuccess = false;
         if (imageUri != null){
@@ -123,6 +124,7 @@ public class UpdateImages {
             } );
         }
         else {
+            dialog.dismiss();
             showToast("Please Select Image First...!!", context );
         }
 
@@ -378,5 +380,6 @@ public class UpdateImages {
     }
 
  **/
+
 
 }

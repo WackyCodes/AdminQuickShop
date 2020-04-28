@@ -33,6 +33,8 @@ import com.example.shailendra.admin.MainActivity;
 import com.example.shailendra.admin.R;
 import com.example.shailendra.admin.StaticValues;
 import com.example.shailendra.admin.addnewitem.AddNewLayoutActivity;
+import com.example.shailendra.admin.addnewitem.AddNewProductActivity;
+import com.example.shailendra.admin.catlayouts.HrLayoutItemModel;
 import com.example.shailendra.admin.database.DBquery;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -45,6 +47,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.example.shailendra.admin.home.MainFragment.commonCatList;
 
 public class ProductDetails extends AppCompatActivity {
 
@@ -96,14 +100,13 @@ public class ProductDetails extends AppCompatActivity {
         setSupportActionBar( toolbar );
         // TODO : get product ID through Intent ...
         productID = getIntent().getStringExtra( "PRODUCT_ID" );
-        productID = "nSoOrHjzwyYwXfad31Ys";
+//        productID = "nSoOrHjzwyYwXfad31Ys";
         // Set Title on Action Menu
         try{
             getSupportActionBar().setDisplayShowTitleEnabled( false );
             getSupportActionBar( ).setDisplayHomeAsUpEnabled( true );
         }catch (NullPointerException e){
         }
-
 
         // Clear the ptoductDetailTempList...
 //        productDetailTempList.clear();
@@ -189,8 +192,8 @@ public class ProductDetails extends AppCompatActivity {
 //                        productDetailTempList.add( 5, "NO_COD" );
                         }
                         if ((long)documentSnapshot.get( "product_stocks" ) > 0){
-                            productStock.setText( "In Stock" );
                             tStocks = (long)documentSnapshot.get( "product_stocks" );
+                            productStock.setText( "In Stock (" + tStocks + ")"  );
                             //add COD in  Temp List
 //                        productDetailTempList.add( 6, "IN_STOCK" );
                         }else{
@@ -348,7 +351,13 @@ public class ProductDetails extends AppCompatActivity {
                 updateStockOrDetails( 0, productDetailsText.getText().toString() );
                 break;
             case R.id.menu_change_full:
-                showToast( "menu_change_full" );
+                Intent gotoAddProductIntent = new Intent( this, AddNewProductActivity.class );
+                gotoAddProductIntent.putExtra( "PRODUCT_ID", productID );
+                gotoAddProductIntent.putExtra( "LAY_INDEX", StaticValues.UPDATE_P_LAY_INDEX );
+                gotoAddProductIntent.putExtra( "CAT_INDEX", StaticValues.UPDATE_P_CAT_INDEX );
+                gotoAddProductIntent.putExtra( "PRODUCT_CAT", StaticValues.UPDATE_PRODUCT_CAT );
+                gotoAddProductIntent.putExtra( "UPDATE", true );
+                startActivity( gotoAddProductIntent );
                 break;
             default:
                 break;
@@ -470,13 +479,13 @@ public class ProductDetails extends AppCompatActivity {
                         upDialog.dismiss();
                         dialog.show();
                         Map<String, Object> updateMap = new HashMap <>();
-                        updateMap.put( "product_price",  newProMrpRate.getText().toString().trim() );
-                        updateMap.put( "product_cut_price",  newProSellingPrice.getText().toString().trim() );
+                        updateMap.put( "product_cut_price",  newProMrpRate.getText().toString().trim() );
+                        updateMap.put( "product_price",  newProSellingPrice.getText().toString().trim() );
                         updateMap.put( "product_off_per", tOffPer );
                         updateOnDatabase( updateMap, dialog );
                         // Set Local...
-                        productPrice.setText( "Rs. " +  newProMrpRate.getText().toString().trim() +"/-" );
-                        productCutPrice.setText( "Rs. " + newProSellingPrice.getText().toString() +"/-" );
+                        productCutPrice.setText( "Rs. " +  newProMrpRate.getText().toString().trim() +"/-" );
+                        productPrice.setText( "Rs. " + newProSellingPrice.getText().toString() +"/-" );
                         productOffPer.setText( tOffPer + "% OFF" );
                     }
                 }
@@ -699,7 +708,7 @@ public class ProductDetails extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task <Void> task) {
                 if (task.isSuccessful()){
-                    dialog.dismiss();
+                    queryToDownloadProductListData( productID, dialog );
                     showToast( "Update Successfully..!" );
                 }else{
                     dialog.dismiss();
@@ -708,6 +717,55 @@ public class ProductDetails extends AppCompatActivity {
             }
         } );
     }
+
+    private static void queryToDownloadProductListData( final String productId, final Dialog dialog ){
+
+        final int layoutIndex = StaticValues.UPDATE_P_LAY_INDEX;
+        final int catIndex = StaticValues.UPDATE_P_CAT_INDEX;
+
+        FirebaseFirestore.getInstance().collection( "PRODUCTS" ).document( productId )
+                .get().addOnCompleteListener( new OnCompleteListener <DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task <DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    // access the banners from database...
+//                    tempHrGridList.add( new HrLayoutItemModel( productId
+//                            , task.getResult().get( "product_image_1").toString()
+//                            , task.getResult().get( "product_full_name" ).toString()
+//                            , task.getResult().get( "product_price" ).toString()
+//                            , task.getResult().get( "product_cut_price" ).toString()
+//                            , (long) task.getResult().get( "product_stocks" )
+//                            , (Boolean) task.getResult().get( "product_cod" ) ) );
+
+                    HrLayoutItemModel hrLayoutItemModel = new HrLayoutItemModel( productId
+                            , task.getResult().get( "product_image_1").toString()
+                            , task.getResult().get( "product_full_name" ).toString()
+                            , task.getResult().get( "product_price" ).toString()
+                            , task.getResult().get( "product_cut_price" ).toString()
+                            , (long) task.getResult().get( "product_stocks" )
+                            , (Boolean) task.getResult().get( "product_cod" ) );
+
+                   int listSize = commonCatList.get(catIndex).get( layoutIndex ).getHrAndGridProductsDetailsList().size();
+
+                   for (int i=0; i < listSize; i++){
+                       if (commonCatList.get(catIndex).get( layoutIndex ).getHrAndGridProductsDetailsList().get( i ).getHrProductId().equals( productId )){
+                           commonCatList.get(catIndex).get( layoutIndex ).getHrAndGridProductsDetailsList().set( i, hrLayoutItemModel );
+                           dialog.dismiss();
+                           break;
+                       }
+                   }
+                    dialog.dismiss();
+                }
+                else{
+                    String error = task.getException().getMessage();
+//                                    showToast(error);
+//                                    dialog.dismiss();
+                }
+            }
+        } );
+    }
+
+
 
 }
 

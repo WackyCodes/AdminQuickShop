@@ -1,7 +1,45 @@
 package com.example.shailendra.admin;
 
+import androidx.annotation.NonNull;
+
+import com.example.shailendra.admin.home.AreaCodeAndName;
+import com.example.shailendra.admin.userprofile.AdminData;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+
 public class StaticValues {
 
+    public static final String APP_VERSION = "a-1-01-1";
+
+    // User Static Variables....
+
+    public static List<String> cityNameList = new ArrayList <>();
+    //    public static List<AreaCodeAndName> areaNameList = new ArrayList <>();
+    public static List<AreaCodeAndName> areaCodeAndNameList = new ArrayList <>();
+    public static List <String> areaNameList = new ArrayList <>();
+    public static String userCityName = null;
+    public static String userAreaCode = null;
+    public static String userAreaName = null;
+    public static String tempProductAreaCode = null;
+
+    //Database References...
+    public static DocumentReference getFirebaseDocumentReference(@NonNull String cityName, @NonNull String areaCode){
+        DocumentReference documentReference = FirebaseFirestore.getInstance().collection( "ADMIN_PER" )
+                .document( cityName.toUpperCase() ).collection( "SUB_LOCATION" ).document( areaCode );
+        return documentReference;
+    }
+
+//    public static
+    public static final AdminData adminData = new AdminData();
+
+    public static final int STORAGE_PERM = 1;
     // Final static values...
     public static final int NOTIFY_ORDER_REQUEST = 141;
     public static final int NOTIFY_OUT_OF_STOCK = 142;
@@ -26,17 +64,56 @@ public class StaticValues {
     public static final int VIEW_ALL_FOR_HORIZONTAL_PRODUCTS = 12;
     public static final int VIEW_ALL_FOR_BANNER_PRODUCTS = 13;
 
+    public static final int SIGN_IN_FRAGMENT =14;
+    public static final int SIGN_UP_FRAGMENT =15;
+    public static final int ORDER_LIST_FRAGMENT =16;
+    public static final int MEMBER_LIST_FRAGMENT =17;
+    public static final int ADD_MEMBER_FRAGMENT =18;
+    public static final int MAIN_FRAGMENT =19;
 
     public static final int GALLERY_CODE = 121;
     public static final int READ_EXTERNAL_MEMORY_CODE = 122;
 
-    // Othr Values....
+    // Other Values....
     public static final int ID_UPDATE = 51;
     public static final int ID_DELETE = 52;
     public static final int ID_CLICK = 53;
     public static final int ID_MOVE = 54;
     public static final int ID_COPY = 55;
 
+    // Making A Empty Product List...
+    public static List<String> emptyProductIdList = new ArrayList <>();
 
+    // create a random order ID of 10 Digits...
+    public static String getRandomOrderID(){
+
+        Random random = new Random();
+        // Generate random integers in range 0 to 9999
+        int rand_int1 = 0;
+        String randNum = "";
+        do {
+            rand_int1 = random.nextInt(100);
+        }while ( rand_int1 <= 0 );
+
+        if (rand_int1 < 99){
+            rand_int1 = rand_int1*100;
+            randNum = String.valueOf( rand_int1 );
+            randNum = randNum.substring( 0, 2 );
+        }
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyMMddHHmmss", Locale.getDefault());
+        //You can change "yyyyMMdd_HHmmss as per your requirement
+        String random12 = simpleDateFormat.format(new Date()) + randNum;
+
+        return random12;
+
+    }
+
+
+    /// ===============
+
+    public static int UPDATE_P_LAY_INDEX;
+    public static int UPDATE_P_CAT_INDEX;
+    public static String UPDATE_PRODUCT_CAT = null;
 
 }

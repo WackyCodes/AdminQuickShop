@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,15 +26,29 @@ import com.example.shailendra.admin.R;
 import com.example.shailendra.admin.StaticMethods;
 import com.example.shailendra.admin.StaticValues;
 import com.example.shailendra.admin.addnewitem.AddNewLayoutActivity;
+import com.example.shailendra.admin.catlayouts.BannerAndCatModel;
 import com.example.shailendra.admin.catlayouts.HrLayoutItemModel;
 import com.example.shailendra.admin.database.UpdateImages;
+import com.example.shailendra.admin.home.CommonCatActivity;
+import com.example.shailendra.admin.home.CommonCatModel;
 import com.example.shailendra.admin.productdetails.ProductDetails;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.shailendra.admin.StaticValues.BANNER_AD_LAYOUT_CONTAINER;
+import static com.example.shailendra.admin.StaticValues.BANNER_SLIDER_CONTAINER_ITEM;
+import static com.example.shailendra.admin.StaticValues.BANNER_SLIDER_LAYOUT_CONTAINER;
+import static com.example.shailendra.admin.StaticValues.GRID_ITEM_LAYOUT_CONTAINER;
+import static com.example.shailendra.admin.StaticValues.HORIZONTAL_ITEM_LAYOUT_CONTAINER;
+import static com.example.shailendra.admin.StaticValues.STRIP_AD_LAYOUT_CONTAINER;
+import static com.example.shailendra.admin.StaticValues.tempProductAreaCode;
+import static com.example.shailendra.admin.StaticValues.userCityName;
 import static com.example.shailendra.admin.home.MainFragment.commonCatList;
 
 public class HorizontalViewAllAdaptor extends RecyclerView.Adapter <HorizontalViewAllAdaptor.ViewHolder> {
@@ -42,14 +57,17 @@ public class HorizontalViewAllAdaptor extends RecyclerView.Adapter <HorizontalVi
     private List <String> layoutIdList;
     private List <Integer> layoutIndexList;
     private String layoutId;
+    private int layIndex;
     private int catIndex;
+    private String catTitle;
 
-    public HorizontalViewAllAdaptor(List <HrLayoutItemModel> horizontalProductList, List <String> layoutIdList, List <Integer> layoutIndexList, String layoutId, int catIndex) {
+    public HorizontalViewAllAdaptor(List <HrLayoutItemModel> horizontalProductList, List <Integer> layoutIndexList, String layoutId,int layIndex, int catIndex, String catTitle) {
         this.horizontalProductList = horizontalProductList;
-        this.layoutIdList = layoutIdList;
         this.layoutIndexList = layoutIndexList;
         this.layoutId = layoutId;
+        this.layIndex = layIndex;
         this.catIndex = catIndex;
+        this.catTitle = catTitle;
     }
 
     @NonNull
@@ -58,7 +76,6 @@ public class HorizontalViewAllAdaptor extends RecyclerView.Adapter <HorizontalVi
         View view = LayoutInflater.from( parent.getContext() ).inflate( R.layout.view_all_horizontal_item_layout, parent, false );
         return new ViewHolder( view );
     }
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
@@ -73,7 +90,6 @@ public class HorizontalViewAllAdaptor extends RecyclerView.Adapter <HorizontalVi
         holder.setData( productId, position, imageLink, name, price, cutPrice, stocks );
 
     }
-
     @Override
     public int getItemCount() {
         return horizontalProductList.size();
@@ -107,31 +123,40 @@ public class HorizontalViewAllAdaptor extends RecyclerView.Adapter <HorizontalVi
             hrProductPrice.setText( "Rs." + price + "/-" );
             hrProductCutPrice.setText( "Rs." + cutPrice + "/-" );
 
+            if (stocks > 0){
+                hrProductStockInfo.setText( "In Stock ("+ stocks + ")" );
+            }else{
+                hrProductStockInfo.setText( "Out of Stock" );
+            }
             Glide.with( itemView.getContext() ).load( imgLink ).apply( new RequestOptions()
                     .placeholder( R.drawable.square_placeholder ) ).into( hrProductImage );
 
             int perOff = ((Integer.parseInt( cutPrice ) - Integer.parseInt( price )) * 100) / Integer.parseInt( cutPrice );
             hrProductOffPercentage.setText( perOff + "% Off" );
 
-
             itemView.setOnClickListener( new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    StaticValues.UPDATE_P_LAY_INDEX = layIndex;
+                    StaticValues.UPDATE_P_CAT_INDEX = catIndex;
+                    StaticValues.UPDATE_PRODUCT_CAT = catTitle;
                     Intent productDetailIntent = new Intent( itemView.getContext(), ProductDetails.class );
                     productDetailIntent.putExtra( "PRODUCT_ID", productId );
                     itemView.getContext().startActivity( productDetailIntent );
                 }
             } );
 
+            editLayButton.setEnabled( false );
             editLayButton.setOnClickListener( new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     PopupWindow popupWindowDogs;
                     // format is DogName::DogID
                     List<String> dogsList = new ArrayList <String>();
-                    dogsList.add( "Move::" + StaticValues.ID_MOVE );
-                    dogsList.add( "Copy::" + StaticValues.ID_COPY );
-                    dogsList.add( "Delete::" + StaticValues.ID_DELETE );
+//                    dogsList.add( "Move::" + StaticValues.ID_MOVE );
+//                    dogsList.add( "Copy::" + StaticValues.ID_COPY );
+//                    dogsList.add( "Delete::" + StaticValues.ID_DELETE );
                     // convert to simple array
                     String[] popUpContents = new String[dogsList.size()];
                     dogsList.toArray(popUpContents);
@@ -144,7 +169,6 @@ public class HorizontalViewAllAdaptor extends RecyclerView.Adapter <HorizontalVi
         }
 
     }
-
     // More Option CLick...
     public PopupWindow popupWindowDogs(final Context context, final boolean isCopyMove, final int productIndex, final String productId, String popUpContents[]) {
         // initialize a pop up window type
@@ -165,36 +189,15 @@ public class HorizontalViewAllAdaptor extends RecyclerView.Adapter <HorizontalVi
                     String selectedItemTag = ((TextView) view).getTag().toString();
                     int ind = Integer.parseInt( layCopyMoveID );
 
-                    List<String> productIdList = new ArrayList <>();
-                    productIdList = commonCatList.get( catIndex ).get( ind ).getHrAndGridLayoutProductIdList();
-                    productIdList.add( productId );
-
-                    layCopyMoveID = commonCatList.get( catIndex ).get( ind ).getLayoutID();
-                    //-----------------------------------
-                    Map <String, Object> layoutMap = new HashMap <>();
-                    layoutMap.put( "layout_title", commonCatList.get( catIndex ).get( ind ).getHrAndGridLayoutTitle() );
-                    layoutMap.put( "no_of_products", productIdList.size() );
-                    layoutMap.put( "index", ind );
-                    layoutMap.put( "layout_id", layCopyMoveID );
-                    layoutMap.put( "visibility", true );
-                    layoutMap.put( "view_type", commonCatList.get( catIndex ).get( ind ).getLayoutType() );
-
-                    for (int i = 0; i < productIdList.size(); i++ ){
-                        layoutMap.put( "product_id_"+(1+i), productIdList.get( i ) );
-                    }
-                    //-----------------------------------
-
                     switch (Integer.parseInt( selectedItemTag )){
                         case StaticValues.ID_COPY:
-                            // TODO: Query To copy...
-                            // Pass : Map, isMoveReq, Dialog, DocId_CPY, DocId_Remove
+                            // Pass : Map, isMoveReq, Dialog, DocId_CPY,
+                            updateDataQuery( context, dialog, ind, productIndex,false, productId );
                             popupWindow.dismiss();
                             break;
                         case StaticValues.ID_MOVE:
-                            // TODO: Query to Move...
-                            /////------- 00000000 ----------
+                            updateDataQuery( context, dialog, ind, productIndex,true, productId );
                             popupWindow.dismiss();
-                            //jkd
                             break;
                         default:
                             break;
@@ -211,7 +214,7 @@ public class HorizontalViewAllAdaptor extends RecyclerView.Adapter <HorizontalVi
                         case StaticValues.ID_MOVE:
                             //  MOVE & COPY
                             copyMoveList.clear();
-                            for (int i = 0; i < layoutIdList.size(); i++){
+                            for (int i = 0; i < layoutIndexList.size(); i++){
                                 temp = layoutIndexList.get( i );
                                 copyMoveList.add( temp + "::" + selectedItemTag);
                             }
@@ -219,11 +222,13 @@ public class HorizontalViewAllAdaptor extends RecyclerView.Adapter <HorizontalVi
                             popUpContents = new String[copyMoveList.size()];
                             copyMoveList.toArray(popUpContents);
                             popupWindow.dismiss();
-                            popupWindowDogs( context, true, productIndex, productId, popUpContents ).showAsDropDown( view );
+                            dialog.dismiss();
+                            PopupWindow popupWindowDogs = popupWindowDogs( context, true, productIndex, productId, popUpContents );
+                            popupWindowDogs.showAsDropDown( view );
+//                            popupWindowDogs.setHeight(  );
                             break;
                         case StaticValues.ID_DELETE:
-                            // TODO : DELETE
-
+                            removeProductFromDocument(dialog, context, productIndex, productId, layoutId );
                             popupWindow.dismiss();
                             break;
                         default:
@@ -238,22 +243,130 @@ public class HorizontalViewAllAdaptor extends RecyclerView.Adapter <HorizontalVi
         popupWindow.setFocusable(true);
         popupWindow.setWidth( WindowManager.LayoutParams.WRAP_CONTENT);
         popupWindow.setHeight( WindowManager.LayoutParams.WRAP_CONTENT);
-        // set the list view as pop up window content
+        // set the list view as pop up window content...
         popupWindow.setContentView(listViewDogs);
 
         return popupWindow;
     }
 
-    private void updateDataQuery(Map <String, Object> layoutMap, boolean isMoveRequest, Dialog dialog, String docId_CPY,@Nullable String docIdRemove){
+    private List<String> productIdList = new ArrayList <>();
+    private void updateDataQuery(final Context context, final Dialog dialog, final int upIndex, final int crrIndex,
+                                 final boolean isMoveRequest, final String productId ){
+        /*
+         1. context
+         2. index : where we have to copy or move
+         3. product ID
+         4. dialog
+         5. isMoveRequest
+         */
+        productIdList = commonCatList.get( catIndex ).get( upIndex ).getHrAndGridLayoutProductIdList();
+        productIdList.add( productId );
+
+        String layCopyMoveID = commonCatList.get( catIndex ).get( upIndex ).getLayoutID();
+
+        Map <String, Object> layoutMap = new HashMap <>();
+        layoutMap.put( "layout_title", commonCatList.get( catIndex ).get( upIndex ).getHrAndGridLayoutTitle() );
+        layoutMap.put( "no_of_products", productIdList.size() );
+        layoutMap.put( "index", upIndex );
+        layoutMap.put( "layout_id", layCopyMoveID );
+        layoutMap.put( "visibility", true );
+        layoutMap.put( "view_type", commonCatList.get( catIndex ).get( upIndex ).getLayoutType() );
+
+        for (int i = 0; i < productIdList.size(); i++ ){
+            layoutMap.put( "product_id_"+(1+i), productIdList.get( i ) );
+        }
+
+        // Create Model to Update in Local...
+        final HrLayoutItemModel hrLayoutItemModel = new HrLayoutItemModel( horizontalProductList.get( crrIndex ).getHrProductId()
+                , horizontalProductList.get( crrIndex ).getHrProductImage()
+                , horizontalProductList.get( crrIndex ).getHrProductName()
+                , horizontalProductList.get( crrIndex ).getHrProductPrice()
+                , horizontalProductList.get( crrIndex ).getHrProductCutPrice()
+                , horizontalProductList.get( crrIndex ).getHrStockInfo()
+                , horizontalProductList.get( crrIndex ).getHrCodInfo() );
+//----------------------------
+
+        if ( userCityName != null && tempProductAreaCode != null){
+            StaticValues.getFirebaseDocumentReference( userCityName, tempProductAreaCode )
+                    .collection( "CATEGORIES" ).document( catTitle.toUpperCase() )
+                    .collection( "LAYOUTS" ).document( layCopyMoveID ).set( layoutMap )
+                    .addOnCompleteListener( new OnCompleteListener <Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task <Void> task) {
+                            if (task.isSuccessful()){
+                                // Success Message...
+                                if (isMoveRequest){
+                                    removeProductFromDocument(dialog, context, crrIndex, productId, layoutId );
+                                }else {
+                                    dialog.dismiss();
+                                    showToast( context, "Update Successfully.!" );
+                                }
+                                // Update in Local List...
+                                commonCatList.get( catIndex ).get( upIndex ).setHrAndGridLayoutProductIdList( productIdList );
+                                commonCatList.get( catIndex ).get( upIndex ).getHrAndGridProductsDetailsList().add( hrLayoutItemModel );
+//                            String hrProductId, String hrProductImage, String hrProductName, String hrProductPrice,
+//                                    String hrProductCutPrice, long hrStockInfo, Boolean hrCodInfo)
+                            }else{
+                                dialog.dismiss();
+                            }
+                        }
+                    } );
+        }else{
+            dialog.dismiss();
+            showToast( context, "Something Went Wrong.!" );
+        }
 
     }
 
+    private void removeProductFromDocument(final Dialog dialog, final Context context, final int productIndex, String productId, String documentId){
+        Map <String, Object> layoutMap = new HashMap <>();
+        List<String> tempProductList = new ArrayList <>();
+        for (int i = 0; i < horizontalProductList.size(); i++){
+            tempProductList.add( horizontalProductList.get( i ).getHrProductId() );
+            if ( !productId.equals( horizontalProductList.get( i ).getHrProductId() )){
+                layoutMap.put("product_id_"+(1+i), horizontalProductList.get( i ).getHrProductId() );
+            }
+        }
+        layoutMap.put( "no_of_products", horizontalProductList.size()-1 );
+
+        if ( userCityName != null && tempProductAreaCode != null){
+            StaticValues.getFirebaseDocumentReference( userCityName, tempProductAreaCode )
+                    .collection( "CATEGORIES" ).document( catTitle.toUpperCase() )
+                    .collection( "LAYOUTS" ).document( documentId ).update( layoutMap )
+                    .addOnCompleteListener( new OnCompleteListener <Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task <Void> task) {
+                            if (task.isSuccessful()){
+                                //  Change in Local data...
+                                commonCatList.get( catIndex ).get( layIndex ).getHrAndGridProductsDetailsList().remove( productIndex );
+                                commonCatList.get( catIndex ).get( layIndex ).getHrAndGridLayoutProductIdList().remove( productIndex );
+                                ViewAllActivity.horizontalItemViewAdaptor.notifyDataSetChanged();
+                                dialog.dismiss();
+                                showToast( context, "Success.!" );
+                            }else{
+                                dialog.dismiss();
+                                showToast( context, "Something went wrong, Process failed.!" );
+                            }
+                        }
+                    } );
+
+        }else{
+            dialog.dismiss();
+            showToast( context, "Something Went Wrong.!" );
+        }
+
+
+    }
+
+    private void showToast(Context context, String msg){
+        Toast.makeText( context, msg, Toast.LENGTH_SHORT ).show();
+    }
 
 }
 
-
-
 /*
+
+
 
 
  */

@@ -1,5 +1,6 @@
 package com.example.shailendra.admin.catlayouts;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -18,25 +19,33 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.shailendra.admin.DialogsClass;
 import com.example.shailendra.admin.R;
+import com.example.shailendra.admin.StaticValues;
 import com.example.shailendra.admin.addnewitem.AddNewProductActivity;
 import com.example.shailendra.admin.productdetails.ProductDetails;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.shailendra.admin.StaticValues.emptyProductIdList;
+
 public class HrLayoutItemAdaptor extends RecyclerView.Adapter<HrLayoutItemAdaptor.ViewHolder> {
 
     List<HrLayoutItemModel> hrLayoutItemModelList;
     String catTitle;
+    int catIndex;
+    int layIndex;
 
-    public HrLayoutItemAdaptor(List <HrLayoutItemModel> hrLayoutItemModelList, String catTitle) {
+    public HrLayoutItemAdaptor(List <HrLayoutItemModel> hrLayoutItemModelList, String catTitle, int catIndex, int layIndex) {
         this.hrLayoutItemModelList = hrLayoutItemModelList;
         this.catTitle = catTitle;
+        this.catIndex = catIndex;
+        this.layIndex = layIndex;
     }
 
     @NonNull
@@ -94,6 +103,7 @@ public class HrLayoutItemAdaptor extends RecyclerView.Adapter<HrLayoutItemAdapto
             addNewItemLayout = itemView.findViewById( R.id.add_new_item_Linearlayout );
         }
 
+        @SuppressLint("ResourceAsColor")
         private void setData(final String productId, String imgLink, String name, String price, String cutPrice, long stocks) {
             itemLayout.setVisibility( View.VISIBLE );
             addNewItemLayout.setVisibility( View.GONE );
@@ -101,6 +111,13 @@ public class HrLayoutItemAdaptor extends RecyclerView.Adapter<HrLayoutItemAdapto
             hrProductName.setText( name );
             hrProductPrice.setText( "Rs." + price + "/-" );
             hrProductCutPrice.setText( "Rs." + cutPrice + "/-" );
+
+            if (stocks > 0){
+                hrProductStockInfo.setText( "In Stock ("+ stocks + ")" );
+            }else{
+                hrProductStockInfo.setText( "Out of Stock" );
+                hrProductStockInfo.setTextColor( R.color.colorRed );
+            }
 
             Glide.with( itemView.getContext() ).load( imgLink ).apply( new RequestOptions()
                     .placeholder( R.drawable.square_placeholder ) ).into( hrProductImage );
@@ -113,6 +130,10 @@ public class HrLayoutItemAdaptor extends RecyclerView.Adapter<HrLayoutItemAdapto
             itemView.setOnClickListener( new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    StaticValues.UPDATE_P_LAY_INDEX = layIndex;
+                    StaticValues.UPDATE_P_CAT_INDEX = catIndex;
+                    StaticValues.UPDATE_PRODUCT_CAT = catTitle;
                     Intent productDetailIntent = new Intent( itemView.getContext(), ProductDetails.class );
                     productDetailIntent.putExtra( "PRODUCT_ID", productId );
                     itemView.getContext().startActivity( productDetailIntent );
@@ -124,6 +145,8 @@ public class HrLayoutItemAdaptor extends RecyclerView.Adapter<HrLayoutItemAdapto
         private void addNewItem(){
             itemLayout.setVisibility( View.GONE );
             addNewItemLayout.setVisibility( View.VISIBLE );
+
+            // ClickListener....
             addNewItemLayout.setOnClickListener( new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -153,7 +176,10 @@ public class HrLayoutItemAdaptor extends RecyclerView.Adapter<HrLayoutItemAdapto
 
                                         Intent gotoAddProductIntent = new Intent(itemView.getContext(), AddNewProductActivity.class );
                                         gotoAddProductIntent.putExtra( "PRODUCT_ID", docId );
+                                        gotoAddProductIntent.putExtra( "LAY_INDEX", layIndex );
+                                        gotoAddProductIntent.putExtra( "CAT_INDEX", catIndex );
                                         gotoAddProductIntent.putExtra( "PRODUCT_CAT", catTitle );
+                                        gotoAddProductIntent.putExtra( "UPDATE", false );
                                         itemView.getContext().startActivity( gotoAddProductIntent );
                                     }else{
                                         // Show Toast..  to try again...
@@ -162,7 +188,6 @@ public class HrLayoutItemAdaptor extends RecyclerView.Adapter<HrLayoutItemAdapto
                                     dialog.dismiss();
                                 }
                             } );
-
 
                 }
             } );

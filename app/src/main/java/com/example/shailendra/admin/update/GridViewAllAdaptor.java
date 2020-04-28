@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.shailendra.admin.R;
+import com.example.shailendra.admin.StaticValues;
 import com.example.shailendra.admin.catlayouts.HrLayoutItemModel;
 import com.example.shailendra.admin.productdetails.ProductDetails;
 
@@ -19,9 +20,15 @@ import java.util.List;
 public class GridViewAllAdaptor extends BaseAdapter {
 
     private List <HrLayoutItemModel> gridProductList;
+    private int layoutIndex;
+    private int catType;
+    private String catTitle;
 
-    public GridViewAllAdaptor(List <HrLayoutItemModel> gridProductList) {
+    public GridViewAllAdaptor(List <HrLayoutItemModel> gridProductList, int layoutIndex, int catType, String catTitle) {
         this.gridProductList = gridProductList;
+        this.layoutIndex = layoutIndex;
+        this.catType = catType;
+        this.catTitle = catTitle;
     }
 
     @Override
@@ -53,7 +60,6 @@ public class GridViewAllAdaptor extends BaseAdapter {
 
             TextView itemStock =  view.findViewById( R.id.stock_text );
 
-
             final HrLayoutItemModel horizontalItemViewModel = gridProductList.get( position );
             itemName.setText( horizontalItemViewModel.getHrProductName() );
             itemPrice.setText( "Rs."+ horizontalItemViewModel.getHrProductPrice() + "/-" );
@@ -65,11 +71,19 @@ public class GridViewAllAdaptor extends BaseAdapter {
             int perOff = ((Integer.parseInt( horizontalItemViewModel.getHrProductCutPrice() ) - Integer.parseInt( horizontalItemViewModel.getHrProductPrice() )) * 100) /
                     Integer.parseInt(  horizontalItemViewModel.getHrProductCutPrice() );
             itemOffPer.setText( perOff + "% Off" );
-
+            if (horizontalItemViewModel.getHrStockInfo() > 0){
+                itemStock.setText( "In Stock (" + horizontalItemViewModel.getHrStockInfo() + ")" );
+            }else{
+                itemStock.setText( "Out Of Stock" );
+            }
 
             view.setOnClickListener( new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    StaticValues.UPDATE_P_LAY_INDEX = layoutIndex;
+                    StaticValues.UPDATE_P_CAT_INDEX = catType;
+                    StaticValues.UPDATE_PRODUCT_CAT = catTitle;
                     Intent gotoProductDetailIntent = new Intent(parent.getContext(), ProductDetails.class);
                     gotoProductDetailIntent.putExtra( "PRODUCT_ID", gridProductList.get( position ).getHrProductId() );
                     parent.getContext().startActivity( gotoProductDetailIntent );

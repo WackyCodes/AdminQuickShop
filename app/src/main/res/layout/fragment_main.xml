@@ -2,15 +2,74 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main_fragment_frameLayout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.example.shailendra.admin.home.MainFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:visibility="visible"
-        android:id="@+id/main_recycler"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorRecyclerBack"/>
+        android:orientation="vertical">
+        <!--        Select Location Content... -->
+        <LinearLayout
+            android:id="@+id/linearLayout4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/colorWhite"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/textView18"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_location_on_black_24dp"
+                android:drawableTint="@color/colorBlue"
+                android:drawablePadding="8dp"
+                android:textColor="@color/colorBlue"
+                android:textStyle="bold"
+                android:textSize="16dp"
+                android:gravity="center_vertical"
+                android:padding="4dp"
+                android:text="Your Location : " />
+            <TextView
+                android:id="@+id/location_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:layout_weight="1"
+                android:drawableRight="@drawable/ic_arrow_drop_down_black_24dp"
+                android:drawableTint="@color/colorSecondary"
+                android:drawablePadding="8dp"
+                android:textColor="@color/colorSecondary"
+                android:textSize="16dp"
+                android:gravity="center_vertical"
+                android:padding="4dp"
+                android:text="Select Location" />
+
+        </LinearLayout>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/home_swipe_refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/main_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorRecyclerBack"
+                android:visibility="visible" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    </LinearLayout>
+
 
     <RelativeLayout
         android:visibility="gone"
@@ -21,7 +80,7 @@
         android:elevation="4dp"
         android:textAlignment="center"
         android:layout_margin="8dp"
-        android:backgroundTint="#CB49B0B4"
+        android:backgroundTint="#AB143031"
         android:background="@drawable/back_white_rad_8dp">
         <LinearLayout
             android:orientation="vertical"
@@ -72,8 +131,10 @@
                 android:layout_width="200dp"
                 android:layout_height="32dp"
                 android:hint="Category Name"
+                android:singleLine="true"
                 android:layout_marginTop="10dp"
                 android:padding="4dp"
+                android:textCursorDrawable="@drawable/wacky_cursor"
                 android:drawablePadding="4dp"
                 android:drawableTint="@color/colorPrimary"
                 android:background="@drawable/back_white_one__dp"

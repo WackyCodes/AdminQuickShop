@@ -30,6 +30,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.shailendra.admin.DialogsClass;
 import com.example.shailendra.admin.R;
+import com.example.shailendra.admin.StaticValues;
 import com.example.shailendra.admin.catlayouts.BannerAndCatModel;
 import com.example.shailendra.admin.catlayouts.HrLayoutItemModel;
 import com.example.shailendra.admin.database.UpdateImages;
@@ -56,6 +57,8 @@ import static com.example.shailendra.admin.StaticValues.GRID_ITEM_LAYOUT_CONTAIN
 import static com.example.shailendra.admin.StaticValues.HORIZONTAL_ITEM_LAYOUT_CONTAINER;
 import static com.example.shailendra.admin.StaticValues.READ_EXTERNAL_MEMORY_CODE;
 import static com.example.shailendra.admin.StaticValues.STRIP_AD_LAYOUT_CONTAINER;
+import static com.example.shailendra.admin.StaticValues.tempProductAreaCode;
+import static com.example.shailendra.admin.StaticValues.userCityName;
 import static com.example.shailendra.admin.home.MainFragment.commonCatList;
 
 public class AddNewLayoutActivity extends AppCompatActivity implements View.OnClickListener {
@@ -63,6 +66,8 @@ public class AddNewLayoutActivity extends AppCompatActivity implements View.OnCl
 
     private DialogsClass dialogsClass = new DialogsClass();
     private Dialog dialog;
+
+
 
     // Add New Banner in Slider....
     private LinearLayout bannerDialogLayoutFrame;
@@ -118,6 +123,12 @@ public class AddNewLayoutActivity extends AppCompatActivity implements View.OnCl
         bannerDialogOkBtn.setOnClickListener( this );
         // Add New Banner in Slider....
 
+        if (isTaskIsUpdate){
+            layoutId = commonCatList.get( catIndex ).get( layoutIndex ).getLayoutID();
+        }else{
+            layoutId = getLayoutId();
+        }
+
         switch (layoutType){
             case BANNER_SLIDER_LAYOUT_CONTAINER:
             case HORIZONTAL_ITEM_LAYOUT_CONTAINER:
@@ -147,7 +158,15 @@ public class AddNewLayoutActivity extends AppCompatActivity implements View.OnCl
                             }
                         }
                     }
-                }else{
+                }
+                else{
+                    if (layoutType == STRIP_AD_LAYOUT_CONTAINER){
+                        bannerDialogBannerImage.setVisibility( View.GONE );
+                        bannerDialogStripImage.setVisibility( View.VISIBLE );
+                    }else{
+                        bannerDialogStripImage.setVisibility( View.GONE );
+                        bannerDialogBannerImage.setVisibility( View.VISIBLE );
+                    }
                     UpdateImages.uploadImageLink = null;
                     bannerImageUri = null;
                     bannerDialogColorCode.setText( "" );
@@ -158,11 +177,6 @@ public class AddNewLayoutActivity extends AppCompatActivity implements View.OnCl
                 break;
             default:
                     break;
-        }
-        if (isTaskIsUpdate){
-            layoutId = commonCatList.get( catIndex ).get( layoutIndex ).getLayoutID();
-        }else{
-            layoutId = getLayoutId();
         }
 
     }
@@ -193,7 +207,7 @@ public class AddNewLayoutActivity extends AppCompatActivity implements View.OnCl
             bannerDialogColorPicker();
         }
         else if (v == bannerDialogUploadImage){
-            if (bannerImageUri != null){
+            if (bannerImageUri != null ){
                 Dialog perDialog = dialogsClass.progressPerDialog( this );
                 perDialog.show();
                 switch (bannerDialogType){
@@ -281,8 +295,8 @@ public class AddNewLayoutActivity extends AppCompatActivity implements View.OnCl
                     bSliderItem.put( "view_type", BANNER_SLIDER_LAYOUT_CONTAINER );
 
                     for (int bsInd = 1; bsInd <= bannerSliderModelList.size(); bsInd++){
-                        bSliderItem.put( "banner_"+ bsInd, bannerSliderModelList.get( bsInd ).getImageLink() );
-                        bSliderItem.put( "banner_"+ bsInd + "_bg", bannerSliderModelList.get( bsInd ).getTitleOrBgColor() );
+                        bSliderItem.put( "banner_"+ bsInd, bannerSliderModelList.get( bsInd-1 ).getImageLink() );
+                        bSliderItem.put( "banner_"+ bsInd + "_bg", bannerSliderModelList.get( bsInd-1 ).getTitleOrBgColor() );
                     }
                     dialog.show();
                     uploadNewLayoutOnDatabase( bSliderItem, BANNER_SLIDER_CONTAINER_ITEM, dialog );
@@ -377,50 +391,56 @@ public class AddNewLayoutActivity extends AppCompatActivity implements View.OnCl
         // we are set our unique Id... Because we need this id to update data...
         final String documentId = layoutMap.get( "layout_id" ).toString();
 
-        firebaseFirestore.collection( "CATEGORIES" ).document( catName.toUpperCase() )
-                .collection( "LAYOUTS" ).document( documentId ).set( layoutMap )
-                .addOnCompleteListener( new OnCompleteListener <Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task <Void> task) {
-                        if (task.isSuccessful()){
-                            switch (view_type){
-                                case BANNER_SLIDER_LAYOUT_CONTAINER:
-                                    commonCatList.get( catIndex ).add( new CommonCatModel( view_type, documentId, new ArrayList <BannerAndCatModel>() ) );
-                                    break;
-                               case BANNER_SLIDER_CONTAINER_ITEM:
-                                   // Notify Data Changed..  of Adaptor...
-                                    break;
-                                case STRIP_AD_LAYOUT_CONTAINER:
-                                    commonCatList.get( catIndex ).add( new CommonCatModel( view_type, documentId,
-                                            layoutMap.get( "strip_ad" ).toString(), layoutMap.get( "strip_bg" ).toString() ) );
-                                    break;
-                                case BANNER_AD_LAYOUT_CONTAINER:
-                                    commonCatList.get( catIndex ).add( new CommonCatModel( view_type, documentId,
-                                            layoutMap.get( "banner_ad" ).toString(), layoutMap.get( "banner_bg" ).toString() ) );
-                                    break;
-                                case HORIZONTAL_ITEM_LAYOUT_CONTAINER:
-                                case GRID_ITEM_LAYOUT_CONTAINER:
-                                    commonCatList.get( catIndex ).add( new CommonCatModel( view_type, documentId,
-                                            layoutMap.get( "layout_title" ).toString(), new ArrayList <String>(),
-                                            new ArrayList <HrLayoutItemModel>() ) );
-                                    break;
-                                default:
-                                    break;
+        if ( userCityName != null && tempProductAreaCode != null){
+            StaticValues.getFirebaseDocumentReference( userCityName, tempProductAreaCode )
+                    .collection( "CATEGORIES" ).document( catName.toUpperCase() )
+                    .collection( "LAYOUTS" ).document( documentId ).set( layoutMap )
+                    .addOnCompleteListener( new OnCompleteListener <Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task <Void> task) {
+                            if (task.isSuccessful()){
+                                switch (view_type){
+                                    case BANNER_SLIDER_LAYOUT_CONTAINER:
+                                        commonCatList.get( catIndex ).add( new CommonCatModel( view_type, documentId, new ArrayList <BannerAndCatModel>() ) );
+                                        break;
+                                    case BANNER_SLIDER_CONTAINER_ITEM:
+                                        // Notify Data Changed..  of Adaptor...
+                                        break;
+                                    case STRIP_AD_LAYOUT_CONTAINER:
+                                        commonCatList.get( catIndex ).add( new CommonCatModel( view_type, documentId,
+                                                layoutMap.get( "strip_ad" ).toString(), layoutMap.get( "strip_bg" ).toString() ) );
+                                        break;
+                                    case BANNER_AD_LAYOUT_CONTAINER:
+                                        commonCatList.get( catIndex ).add( new CommonCatModel( view_type, documentId,
+                                                layoutMap.get( "banner_ad" ).toString(), layoutMap.get( "banner_bg" ).toString() ) );
+                                        break;
+                                    case HORIZONTAL_ITEM_LAYOUT_CONTAINER:
+                                    case GRID_ITEM_LAYOUT_CONTAINER:
+                                        commonCatList.get( catIndex ).add( new CommonCatModel( view_type, documentId,
+                                                layoutMap.get( "layout_title" ).toString(), new ArrayList <String>(),
+                                                new ArrayList <HrLayoutItemModel>() ) );
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                CommonCatActivity.commonCatAdaptor.notifyDataSetChanged();
+                                dialog.dismiss();
+                                showToast( "Added Successfully..!" );
+                                finish();
+                            }else{
+                                dialog.dismiss();
+                                if (view_type == BANNER_SLIDER_CONTAINER_ITEM){
+                                    commonCatList.get( catIndex ).get( layoutIndex ).getBannerAndCatModelList().remove(
+                                            commonCatList.get( catIndex ).get( layoutIndex ).getBannerAndCatModelList().size()-1 );
+                                }
+                                showToast( "failed..! Error : " + task.getException().getMessage() );
                             }
-                            CommonCatActivity.commonCatAdaptor.notifyDataSetChanged();
-                            dialog.dismiss();
-                            showToast( "Added Successfully..!" );
-                            finish();
-                        }else{
-                            dialog.dismiss();
-                            if (view_type == BANNER_SLIDER_CONTAINER_ITEM){
-                                commonCatList.get( catIndex ).get( layoutIndex ).getBannerAndCatModelList().remove(
-                                        commonCatList.get( catIndex ).get( layoutIndex ).getBannerAndCatModelList().size()-1 );
-                            }
-                            showToast( "failed..! Error : " + task.getException().getMessage() );
                         }
-                    }
-                } );
+                    } );
+        }else{
+            dialog.dismiss();
+        }
+
     }
 
     // Color Picker...Dialog.
@@ -566,3 +586,4 @@ public class AddNewLayoutActivity extends AppCompatActivity implements View.OnCl
 
 
 }
+
