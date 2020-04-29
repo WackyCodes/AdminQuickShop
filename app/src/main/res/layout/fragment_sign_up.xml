@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/sign_up_frameLayout"
+    tools:context=".userprofile.SignUpFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:background="@color/colorWhite"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:visibility="invisible"
+            android:id="@+id/close_sign_up_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:elevation="4dp"
+            android:tint="@color/colorPrimary"
+            android:translationZ="4dp"
+            app:layout_constraintEnd_toEndOf="@+id/scrollView3"
+            app:layout_constraintTop_toTopOf="@+id/scrollView3"
+            app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+
+        <ScrollView
+            android:id="@+id/scrollView3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="80dp"
+                    android:textAlignment="center"
+                    android:layout_gravity="center"
+                    app:srcCompat="@mipmap/logo" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="30dp"
+                    android:fontFamily="serif"
+                    android:gravity="center"
+                    android:text="User Registration"
+                    android:textColor="#000"
+                    android:textSize="20dp" />
+
+                <LinearLayout
+                    android:id="@+id/x_Ret_Registration_Layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dp"
+                    android:background="@drawable/x_ractangle_layout"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+
+                    <EditText
+                        android:id="@+id/sign_up_UserName_rt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/one_dp_border_back"
+                        android:drawableLeft="@drawable/ic_account_circle_black_24dp"
+                        android:drawablePadding="8dp"
+                        android:drawableTint="@color/colorPrimary"
+                        android:fontFamily="serif"
+                        android:hint="Enter Your Name *"
+                        android:inputType="text"
+                        android:padding="8dp"
+                        android:textColor="@color/colorSecondary"
+                        android:textSize="20dp" />
+
+                    <TextView
+                        android:id="@+id/sign_up_UserEmail_rt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/one_dp_border_back"
+                        android:drawableLeft="@drawable/ic_email_black_24dp"
+                        android:drawablePadding="8dp"
+                        android:drawableTint="@color/colorPrimary"
+                        android:fontFamily="serif"
+                        android:hint="Enter Your Email *"
+                        android:inputType="textWebEmailAddress"
+                        android:padding="8dp"
+                        android:textColor="@color/colorSecondary"
+                        android:textSize="20dp" />
+
+                    <TextView
+                        android:id="@+id/sign_up_UserPhone_rt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/one_dp_border_back"
+                        android:drawableLeft="@drawable/ic_call_black_24dp"
+                        android:drawablePadding="8dp"
+                        android:drawableTint="@color/colorPrimary"
+                        android:fontFamily="serif"
+                        android:hint="Enter Your Mobile (Optional)"
+                        android:inputType="phone"
+                        android:padding="8dp"
+                        android:textColor="@color/colorSecondary"
+                        android:textSize="20dp" />
+
+                    <EditText
+                        android:id="@+id/sign_up_UserPass1_rt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/one_dp_border_back"
+                        android:drawableLeft="@drawable/ic_lock_black_24dp"
+                        android:drawablePadding="8dp"
+                        android:drawableTint="@color/colorPrimary"
+                        android:fontFamily="serif"
+                        android:hint="Enter Password *"
+                        android:inputType="textPassword"
+                        android:padding="8dp"
+                        android:textColor="@color/colorSecondary"
+                        android:textSize="20dp" />
+
+                    <EditText
+                        android:id="@+id/sign_up_UserPass2_rt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="40dp"
+                        android:background="@drawable/one_dp_border_back"
+                        android:drawableLeft="@drawable/ic_lock_black_24dp"
+                        android:drawablePadding="8dp"
+                        android:drawableTint="@color/colorPrimary"
+                        android:fontFamily="serif"
+                        android:hint="Enter Password Again..*"
+                        android:inputType="textPassword"
+                        android:padding="8dp"
+                        android:textColor="@color/colorSecondary"
+                        android:textSize="20dp" />
+
+                    <Button
+                        android:id="@+id/sign_up_UserRegisterBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:backgroundTint="@color/colorPrimary"
+                        android:padding="2dp"
+                        android:text="Register here"
+                        android:textColor="@color/colorWhite" />
+
+
+                    <TextView
+                        android:id="@+id/sign_up_UserAlready"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="20dp"
+                        android:gravity="center"
+                        android:text="Already Register ? LogIn here..."
+                        android:textColor="@color/colorSecondary" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+        </ScrollView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</FrameLayout>
