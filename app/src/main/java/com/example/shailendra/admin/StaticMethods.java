@@ -12,6 +12,11 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class StaticMethods {
 
 
@@ -78,5 +83,24 @@ public class StaticMethods {
 
         return adapter;
     }
+
+    public static String getCurrentDateDay(){
+//        Calendar calendar = Calendar.getInstance();
+        Date date =  Calendar.getInstance().getTime();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        //You can change "yyyyMMdd_HHmmss as per your requirement
+//        String crrDate = simpleDateFormat.format(new Date()) ;
+
+        String crrDateDay = simpleDateFormat.format(new Date())+ " " + new SimpleDateFormat( "EEEE", Locale.ENGLISH).format( date.getTime() );
+
+        return crrDateDay;
+    }
+
+    public static String getCurrentTime(){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        String crrTime = simpleDateFormat.format(new Date()) ;
+        return crrTime;
+    }
+
 
 }

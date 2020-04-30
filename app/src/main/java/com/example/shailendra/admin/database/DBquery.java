@@ -2,20 +2,28 @@ package com.example.shailendra.admin.database;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.shailendra.admin.DialogsClass;
+import com.example.shailendra.admin.MainActivity;
 import com.example.shailendra.admin.StaticValues;
 import com.example.shailendra.admin.catlayouts.BannerAndCatModel;
 import com.example.shailendra.admin.catlayouts.HrLayoutItemModel;
 import com.example.shailendra.admin.home.CommonCatModel;
 import com.example.shailendra.admin.home.MainAdaptor;
 import com.example.shailendra.admin.home.MainFragment;
+import com.example.shailendra.admin.notifications.NotificationsActivity;
+import com.example.shailendra.admin.notifications.NotificationsModel;
+import com.example.shailendra.admin.order.NewOrder;
 import com.example.shailendra.admin.order.OrderAdaptor;
+import com.example.shailendra.admin.order.OrderDetailsActivity;
 import com.example.shailendra.admin.order.OrderModel;
 import com.example.shailendra.admin.order.OrderProductModel;
 import com.example.shailendra.admin.userprofile.AdminData;
@@ -28,7 +36,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -37,10 +48,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.meta.When;
+
+import static com.example.shailendra.admin.DialogsClass.isInternetConnect;
 import static com.example.shailendra.admin.StaticValues.BANNER_AD_LAYOUT_CONTAINER;
 import static com.example.shailendra.admin.StaticValues.BANNER_SLIDER_LAYOUT_CONTAINER;
 import static com.example.shailendra.admin.StaticValues.GRID_ITEM_LAYOUT_CONTAINER;
 import static com.example.shailendra.admin.StaticValues.HORIZONTAL_ITEM_LAYOUT_CONTAINER;
+import static com.example.shailendra.admin.StaticValues.NOTIFY_ORDER_REQUEST;
 import static com.example.shailendra.admin.StaticValues.SIGN_IN_FRAGMENT;
 import static com.example.shailendra.admin.StaticValues.STRIP_AD_LAYOUT_CONTAINER;
 import static com.example.shailendra.admin.StaticValues.tempProductAreaCode;
@@ -61,6 +76,9 @@ public class DBquery {
     public static FirebaseUser currentUser =  firebaseAuth.getCurrentUser();
     public static FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
+
+    public static List<NotificationsModel> notificationModelList = new ArrayList <>();
+    private static ListenerRegistration notificationLR;
 
     // Home screen Category ...
     public static List<BannerAndCatModel> homeCategoryIconList = new ArrayList <>();
@@ -266,64 +284,6 @@ public class DBquery {
         return true;
     }
 
-    public static void getOrderListQuery(final RecyclerView recyclerView){
-
-        firebaseFirestore.collection( "COM_ORDERS" ).orderBy( "order_id" )
-                .get().addOnCompleteListener( new OnCompleteListener <QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task <QuerySnapshot> task) {
-                if (task.isSuccessful()){
-                    // Create a product List...
-                    OrderAdaptor orderAdaptor = new OrderAdaptor( orderModelList );
-                    recyclerView.setAdapter( orderAdaptor );
-
-                    for (QueryDocumentSnapshot documentSnapshot : task.getResult()){
-
-                        List<OrderProductModel> productModelList = new ArrayList <>();
-
-                        long no_of_product = (long)documentSnapshot.get( "no_of_products" );
-
-                        for (long i = 0; i < no_of_product; i++){
-                            productModelList.add( new OrderProductModel(
-                                    documentSnapshot.get( "product_id_"+i ).toString(),
-                                    documentSnapshot.get( "product_img_"+i ).toString(),
-                                    documentSnapshot.get( "product_name_"+i ).toString(),
-                                    documentSnapshot.get( "product_price_"+i ).toString(),
-                                    documentSnapshot.get( "product_qty_"+i ).toString()
-                            ) );
-                            if (i == no_of_product - 1){
-
-                                orderModelList.add( new OrderModel(
-                                        documentSnapshot.get( "order_id" ).toString(),
-                                        documentSnapshot.get( "user_phone" ).toString(),
-                                        documentSnapshot.get( "order_by" ).toString(),
-                                        documentSnapshot.get( "bill_amount" ).toString(),
-                                        documentSnapshot.get( "delivery_charge" ).toString(),
-                                        documentSnapshot.get( "pay_mode" ).toString(),
-                                        documentSnapshot.get( "order_delivered_name" ).toString(),
-                                        documentSnapshot.get( "order_delivery_address" ).toString(),
-                                        documentSnapshot.get( "order_delivery_pin" ).toString(),
-                                        documentSnapshot.get( "delivery_status" ).toString(),
-                                        documentSnapshot.get( "order_date_day" ).toString(),
-                                        documentSnapshot.get( "order_time" ).toString(),
-                                        no_of_product,
-                                        productModelList
-                                ) );
-                                orderAdaptor.notifyDataSetChanged();
-                            }
-                        }
-
-                    }
-
-
-                }else{
-
-                }
-            }
-        } );
-
-    }
-
     public static void getMemberListQuery(String cityName, final Dialog dialog){
         adminMemberList.clear();
 
@@ -372,13 +332,297 @@ public class DBquery {
 
     }
 
+    //////////////////// ---- Order Query ----///////////////////////
 
-    ///////////////////////////////////////////
-    // CityName And AreaName List...
-    // Query to Load City Name....
+    /*
+     *          (1) WAITING : when order is not accepted by admin...
+     *          (2) ACCEPTED : when order has been accepted...
+     *          (3) PROCESS : When order is in process to delivery...
+     *          (4) CANCELLED : When Order has been cancelled by user...
+     *          (5) SUCCESS : when order has been delivered successfully...
+     *          (6) FAILED : when PayMode Online and payment has been failed...
+     *          (7) PENDING : when Payment is Pending
+     */
 
-//    {
-//    }
+    public static void getOrderListQuery( ){
+
+        firebaseFirestore.collection( "COM_ORDERS" ).orderBy( "order_id" )
+                .get().addOnCompleteListener( new OnCompleteListener <QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task <QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    // Create a product List...
+
+                    for (QueryDocumentSnapshot documentSnapshot : task.getResult()){
+
+                        List<OrderProductModel> productModelList = new ArrayList <>();
+
+                        long no_of_product = (long)documentSnapshot.get( "no_of_products" );
+
+                        for (long i = 0; i < no_of_product; i++){
+                            productModelList.add( new OrderProductModel(
+                                    documentSnapshot.get( "product_id_"+i ).toString(),
+                                    documentSnapshot.get( "product_img_"+i ).toString(),
+                                    documentSnapshot.get( "product_name_"+i ).toString(),
+                                    documentSnapshot.get( "product_price_"+i ).toString(),
+                                    documentSnapshot.get( "product_qty_"+i ).toString()
+                            ) );
+                            if (i == no_of_product - 1){
+                                if (documentSnapshot.get( "delivery_status" ).toString().equals( "ACCEPTED" )){
+                                    orderModelList.add( 0, new OrderModel(
+                                            documentSnapshot.get( "order_id" ).toString(),
+                                            documentSnapshot.get( "user_phone" ).toString(),
+                                            documentSnapshot.get( "order_by" ).toString(),
+                                            documentSnapshot.get( "bill_amount" ).toString(),
+                                            documentSnapshot.get( "delivery_charge" ).toString(),
+                                            documentSnapshot.get( "pay_mode" ).toString(),
+                                            documentSnapshot.get( "order_delivered_name" ).toString(),
+                                            documentSnapshot.get( "order_delivery_address" ).toString(),
+                                            documentSnapshot.get( "order_delivery_pin" ).toString(),
+                                            documentSnapshot.get( "delivery_status" ).toString(),
+                                            documentSnapshot.get( "order_date_day" ).toString(),
+                                            documentSnapshot.get( "order_time" ).toString(),
+                                            no_of_product,
+                                            productModelList
+                                    ) );
+                                }
+                                else{
+                                    orderModelList.add( new OrderModel(
+                                            documentSnapshot.get( "order_id" ).toString(),
+                                            documentSnapshot.get( "user_phone" ).toString(),
+                                            documentSnapshot.get( "order_by" ).toString(),
+                                            documentSnapshot.get( "bill_amount" ).toString(),
+                                            documentSnapshot.get( "delivery_charge" ).toString(),
+                                            documentSnapshot.get( "pay_mode" ).toString(),
+                                            documentSnapshot.get( "order_delivered_name" ).toString(),
+                                            documentSnapshot.get( "order_delivery_address" ).toString(),
+                                            documentSnapshot.get( "order_delivery_pin" ).toString(),
+                                            documentSnapshot.get( "delivery_status" ).toString(),
+                                            documentSnapshot.get( "order_date_day" ).toString(),
+                                            documentSnapshot.get( "order_time" ).toString(),
+                                            no_of_product,
+                                            productModelList
+                                    ) );
+                                }
+
+                                if (NewOrder.orderListAdaptor!=null){
+                                    NewOrder.orderListAdaptor.notifyDataSetChanged();
+                                }
+
+                            }
+                        }
+
+                    }
+
+                }else{
+
+                }
+            }
+        } );
+
+    }
+
+    public static void addOneInOrderListQuery(String orderId, final Context context, final boolean isViewRequest ){
+        final Dialog dialog = new DialogsClass().progressDialog( context );
+        if (isViewRequest){
+            dialog.show();
+        }
+        firebaseFirestore.collection( "COM_ORDERS" )
+                .document( orderId ).get()
+                .addOnCompleteListener( new OnCompleteListener <DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task <DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            List<OrderProductModel> productModelList = new ArrayList <>();
+                            long no_of_product = (long)task.getResult().get( "no_of_products" );
+                            for (long i = 0; i < no_of_product; i++){
+                                productModelList.add( new OrderProductModel(
+                                        task.getResult().get( "product_id_"+i ).toString(),
+                                        task.getResult().get( "product_img_"+i ).toString(),
+                                        task.getResult().get( "product_name_"+i ).toString(),
+                                        task.getResult().get( "product_price_"+i ).toString(),
+                                        task.getResult().get( "product_qty_"+i ).toString()
+                                ) );
+                                if (i == no_of_product - 1){
+
+                                    orderModelList.add( 0, new OrderModel(
+                                            task.getResult().get( "order_id" ).toString(),
+                                            task.getResult().get( "user_phone" ).toString(),
+                                            task.getResult().get( "order_by" ).toString(),
+                                            task.getResult().get( "bill_amount" ).toString(),
+                                            task.getResult().get( "delivery_charge" ).toString(),
+                                            task.getResult().get( "pay_mode" ).toString(),
+                                            task.getResult().get( "order_delivered_name" ).toString(),
+                                            task.getResult().get( "order_delivery_address" ).toString(),
+                                            task.getResult().get( "order_delivery_pin" ).toString(),
+                                            task.getResult().get( "delivery_status" ).toString(),
+                                            task.getResult().get( "order_date_day" ).toString(),
+                                            task.getResult().get( "order_time" ).toString(),
+                                            no_of_product,
+                                            productModelList
+                                    ) );
+                                    dialog.dismiss();
+                                    if (isViewRequest){
+                                        Intent intent = new Intent( context, OrderDetailsActivity.class );
+                                        intent.putExtra( "INDEX", 0 );
+                                        context.startActivity( intent );
+                                    }
+                                }
+                            }
+
+                        }else{
+                            dialog.dismiss();
+                        }
+                    }
+                } );
+    }
+
+    public static void updateOrderStatusQuery(final Context context, final Dialog dialog, final String orderId,
+                                              Map <String, Object> updateDataMap, final String notifyUserId ){
+
+        firebaseFirestore.collection( "COM_ORDERS" )
+                .document( orderId ).update( updateDataMap )
+                .addOnCompleteListener( new OnCompleteListener <Void>() {
+            @Override
+            public void onComplete(@NonNull Task <Void> task) {
+                if (task.isSuccessful()){
+                    dialog.dismiss();
+                    Toast.makeText( context, "Order Delivered Successfully.!", Toast.LENGTH_SHORT ).show();
+
+                    Map <String, Object> userData = new HashMap <>();
+                    userData.put( "notify_type", "ORDER_UPDATE" );
+                    userData.put( "notify_image", " " );
+                    userData.put( "notify_order_id", orderId );
+                    userData.put( "notify_heading", "Delivered.!" );
+                    userData.put( "notify_text", "Your order has been Delivered.!" );
+                    userData.put( "notify_read", false );
+
+                    DBquery.queryToNotifyUser( context, null, notifyUserId, userData );
+                    if (NewOrder.orderListAdaptor!=null){
+                        NewOrder.orderListAdaptor.notifyDataSetChanged();
+                    }
+                }else{
+                    dialog.dismiss();
+                }
+            }
+        } );
+    }
+
+    //////////////////// ---- Order Query ----///////////////////////
+
+    // Query To update Notifications...
+    public static void updateNotificationQuery( Context context, boolean remove ){
+
+     /*   delivery Status :
+     *          (1) WAITING : when order is not accepted by admin...
+     *          (2) ACCEPTED : when order has been accepted...
+     *          (3) PROCESS : When order is in process to delivery...
+     *          (4) CANCELLED : When Order has been cancelled by user...
+     *          (5) SUCCESS : when order has been delivered successfully...
+     *          (6) FAILED : when PayMode Online and payment has been failed...
+     *          (7) PENDING : when Payment is Pending
+     */
+
+        if (remove ){
+            if ( notificationLR != null )
+                notificationLR.remove();
+        }
+        else{
+            if (isInternetConnect( context )){
+
+                notificationLR = firebaseFirestore.collection("COM_ORDERS").orderBy( "order_id" )
+                        .addSnapshotListener( new EventListener <QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (queryDocumentSnapshots != null ){
+                            // TODO: Query to update notification...
+
+                            int notifyCount = 0;
+                            notificationModelList.clear();
+
+//                          int notifyType, String notifyImage, String headText, String subHeadingText)
+                            for ( int x = 0; x < queryDocumentSnapshots.getDocuments().size(); x++ ){
+                                DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get( x );
+                                if( documentSnapshot.get( "delivery_status" ).toString().equals( "WAITING" ) ){
+                                    notificationModelList.add(
+                                            new NotificationsModel( NOTIFY_ORDER_REQUEST,
+                                                    documentSnapshot.get( "order_id" ).toString(),
+                                                    documentSnapshot.get( "order_by" ).toString())
+                                    );
+                                    notifyCount = notifyCount + 1;
+                                }
+                            }
+
+                            if (MainActivity.badgeNotifyCount != null){
+                                if (notifyCount > 0){
+                                    MainActivity.badgeNotifyCount.setVisibility( View.VISIBLE );
+                                    MainActivity.badgeNotifyCount.setText( String.valueOf( notifyCount ) );
+                                }else{
+                                    MainActivity.badgeNotifyCount.setVisibility( View.INVISIBLE );
+                                }
+                            }
+
+                            if(NotificationsActivity.notificationsAdaptor!=null){
+                                NotificationsActivity.notificationsAdaptor.notifyDataSetChanged();
+                            }
+
+                        }
+                    }
+                } );
+
+//                        notificationLR = firebaseFirestore.collection( "USER" ).document( FirebaseAuth.getInstance().getUid() )
+//                        .collection( "USER_DATA" ).document( "MY_NOTIFICATION" )
+//                        .addSnapshotListener( new EventListener <DocumentSnapshot>() {
+//                            @Override
+//                            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+//                                if (documentSnapshot != null && documentSnapshot.exists()){
+//                                    notificationModelList.clear();
+//                                    int notifyCount = 0;
+////                                    int notifyType, String notifyImage, String headText, String subHeadingText)
+//                                    for ( long x = 0; x < (long) documentSnapshot.get( "notification_size" ); x++ ){
+//                                        notificationModelList.add( 0, new NotificationModel(
+//                                                documentSnapshot.get( "noti_img_"+x ).toString(),
+//                                                documentSnapshot.get( "noti_text_"+x ).toString(),
+//                                                (boolean)documentSnapshot.get( "noti_read_"+x )
+//                                        ) );
+//                                        if (!documentSnapshot.getBoolean( "noti_read_"+x )){
+//                                            notifyCount = notifyCount + 1;
+//                                        }
+//                                    }
+//                                    if (MainActivity.badgeNotifyCount != null){
+//                                        if (notifyCount > 0){
+//                                            MainActivity.badgeNotifyCount.setVisibility( View.VISIBLE );
+//                                            MainActivity.badgeNotifyCount.setText( String.valueOf( notifyCount ) );
+//                                        }else{
+//                                            MainActivity.badgeNotifyCount.setVisibility( View.INVISIBLE );
+//                                        }
+//                                    }
+//                                    if (NotificationActivity.notificationAdaptor != null ){
+//                                        NotificationActivity.notificationAdaptor.notifyDataSetChanged();
+//                                    }
+//                                }
+//                            }
+//                        } );
+
+            }
+        }
+    }
+
+
+    // Notify User....
+    public static void queryToNotifyUser(Context context,@Nullable final Dialog dialog, String notifyUserId, Map <String, Object> notifyMap){
+
+        firebaseFirestore.collection( "USER" ).document( notifyUserId )
+                .collection( "USER_NOTIFICATION" ).add( notifyMap )
+                .addOnCompleteListener( new OnCompleteListener <DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task <DocumentReference> task) {
+                        if (dialog != null){
+                            dialog.dismiss();
+                        }
+                    }
+                } );
+    }
 
 
 }

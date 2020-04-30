@@ -10,12 +10,14 @@
 
 
     <ScrollView
+        android:id="@+id/scrollView4"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -36,18 +38,18 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Order ID :"
-                    android:textStyle="bold"
                     android:textAlignment="center"
                     android:textColor="@color/colorPrimary"
-                    android:textSize="18dp" />
+                    android:textSize="18dp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/orderId"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="202002981983"
                     android:gravity="start"
+                    android:text="202002981983"
                     android:textAlignment="textStart"
                     android:textColor="@color/colorGreen"
                     android:textSize="18dp"
@@ -142,10 +144,10 @@
             </LinearLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_margin="4dp"
-                android:background="@drawable/back_white_one__dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:background="@drawable/back_white_one__dp">
 
                 <LinearLayout
                     android:id="@+id/linearLayout6"
@@ -251,6 +253,7 @@
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -295,6 +298,7 @@
                         android:textSize="18dp" />
 
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -321,6 +325,7 @@
                         android:textSize="18dp" />
 
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -363,8 +368,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Products :"
                     android:gravity="start"
+                    android:text="Products :"
                     android:textAlignment="textStart"
                     android:textColor="@color/colorPrimary"
                     android:textSize="18dp" />
@@ -384,7 +389,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/order_product_det_recycler"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 
@@ -393,6 +398,22 @@
     </ScrollView>
 
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:visibility="gone"
+        android:id="@+id/floating_confirmDelivery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1"
+        android:backgroundTint="@color/colorGreen"
+        android:clickable="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_check_circle_black_24dp"
+        android:tint="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

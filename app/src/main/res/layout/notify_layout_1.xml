@@ -55,6 +55,7 @@
             android:padding="8dp"
             android:orientation="horizontal">
             <Button
+                android:id="@+id/acceptBtn"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_weight="1"
@@ -65,6 +66,7 @@
                 android:backgroundTint="@color/colorGreen"
                 android:textColor="@color/colorWhite"/>
             <Button
+                android:id="@+id/viewBtn"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_weight="1"

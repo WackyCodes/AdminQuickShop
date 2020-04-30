@@ -7,9 +7,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.text.style.TtsSpan;
 import android.view.MenuItem;
 
 import com.example.shailendra.admin.R;
+import com.example.shailendra.admin.database.DBquery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,7 @@ import static com.example.shailendra.admin.StaticValues.NOTIFY_ORDER_REQUEST;
 public class NotificationsActivity extends AppCompatActivity {
 
     private RecyclerView notificationRecycler;
+    public static NotificationsAdaptor notificationsAdaptor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +37,6 @@ public class NotificationsActivity extends AppCompatActivity {
             getSupportActionBar( ).setDisplayHomeAsUpEnabled( true );
         }catch (NullPointerException e){
         }
-        /// Sample Notification List...
-        List<NotificationsModel> notificationsModelList = new ArrayList <>();
-        notificationsModelList.add( new NotificationsModel( NOTIFY_ORDER_REQUEST, " ",
-                "Request a Order", "Order ID : 20120839983270" ) );
 
         // Set Recycler Layout...
         notificationRecycler = findViewById( R.id.notification_recycler );
@@ -46,12 +45,22 @@ public class NotificationsActivity extends AppCompatActivity {
         layoutManager.setOrientation( RecyclerView.VERTICAL );
         notificationRecycler.setLayoutManager( layoutManager );
         // Adaptor...
-        NotificationsAdaptor adaptor = new NotificationsAdaptor( notificationsModelList );
-        notificationRecycler.setAdapter( adaptor );
-        adaptor.notifyDataSetChanged();
+
+        notificationsAdaptor = new NotificationsAdaptor( DBquery.notificationModelList );
+        notificationRecycler.setAdapter( notificationsAdaptor );
+        notificationsAdaptor.notifyDataSetChanged();
 
     }
     // End Of onCreate...
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(notificationsAdaptor!=null){
+            notificationsAdaptor.notifyDataSetChanged();
+        }
+    }
 
     // Tool Bar Item Selected....
     @Override

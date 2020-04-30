@@ -2,6 +2,7 @@ package com.example.shailendra.admin.userprofile;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.shailendra.admin.CheckInternetConnection;
+import com.example.shailendra.admin.DialogsClass;
 import com.example.shailendra.admin.MainActivity;
 import com.example.shailendra.admin.R;
 import com.example.shailendra.admin.StaticValues;
@@ -136,9 +138,25 @@ public class SignUpFragment extends Fragment {
                                         // if come from first activity (launching activity...)
                                         progressDialog.dismiss();
                                         if (task.isSuccessful()){
-                                            startActivity( new Intent( getActivity(), MainActivity.class ) );
-                                            getActivity().finish();
-                                            showToast( "Sign Up Successfully..!" );
+//                                            if(StaticValues.adminData.getAdminType().equals( "C" )){ // For Delivery Boy
+//                                                // TODO: User have to show order list... and success delivery Notification...
+//
+//                                                progressDialog.dismiss();
+//                                            }
+//                                            startActivity( new Intent( getActivity(), MainActivity.class ) );
+//                                            getActivity().finish();
+//                                            showToast( "Sign Up Successfully..!" );
+                                            progressDialog.dismiss();
+                                            new DialogsClass().alertDialog( getContext(), "Please Open Again.!",
+                                                    "You have successfully registered. Please Open again App to interact.!",
+                                                    null ).setPositiveButton( "OK", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                    getActivity().finish();
+                                                }
+                                            } ).show();
+
                                         }else{
                                             showToast( "Something Went wrong..! Error : "+ task.getException().getMessage() );
                                         }

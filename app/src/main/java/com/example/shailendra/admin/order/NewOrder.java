@@ -26,6 +26,8 @@ public class NewOrder extends Fragment {
         // Required empty public constructor
     }
 
+    public static OrderAdaptor orderListAdaptor;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -37,19 +39,25 @@ public class NewOrder extends Fragment {
         layoutManager.setOrientation( RecyclerView.VERTICAL );
         orderRecycler.setLayoutManager( layoutManager );
         // TODO : Create a adaptor and set that on recycler..
+        orderListAdaptor = new OrderAdaptor( DBquery.orderModelList );
+        orderRecycler.setAdapter( orderListAdaptor );
         if ( DBquery.orderModelList.size() == 0){
-            DBquery.getOrderListQuery( orderRecycler );
+            DBquery.getOrderListQuery( );
         }else{
-            OrderAdaptor orderAdaptor = new OrderAdaptor( DBquery.orderModelList );
-            orderRecycler.setAdapter( orderAdaptor );
-            orderAdaptor.notifyDataSetChanged();
+            orderListAdaptor.notifyDataSetChanged();
         }
 
         return view;
 
     }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (orderListAdaptor!=null){
+            orderListAdaptor.notifyDataSetChanged();
+        }
+    }
 
 
 }

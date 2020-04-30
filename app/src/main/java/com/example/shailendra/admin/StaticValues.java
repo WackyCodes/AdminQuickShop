@@ -38,6 +38,11 @@ public class StaticValues {
 
 //    public static
     public static final AdminData adminData = new AdminData();
+    // Admin Type Static Value...
+    public static final String TYPE_FOUNDER = "A";
+    public static final String TYPE_PRODUCT_MANAGER = "B";
+    public static final String TYPE_DELIVERY_BOY = "C";
+    public static final String TYPE_PERMISSION_DENIED = "D";
 
     public static final int STORAGE_PERM = 1;
     // Final static values...

@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ import com.example.shailendra.admin.database.DBquery;
 import com.example.shailendra.admin.home.AreaCodeAndName;
 import com.example.shailendra.admin.home.CommonCatActivity;
 import com.example.shailendra.admin.home.MainFragment;
+import com.example.shailendra.admin.notifications.NotificationsActivity;
 import com.example.shailendra.admin.order.NewOrder;
 import com.example.shailendra.admin.productdetails.ProductDetails;
 import com.example.shailendra.admin.userprofile.AddAdminMember;
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Toolbar toolbar;
     public static DrawerLayout drawer;
     public static NavigationView navigationView;
+    public static TextView badgeNotifyCount;
 
     Dialog dialog;
     public static int wCurrentFragment;
@@ -102,7 +105,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle( this, drawer, toolbar, R.string.navigation_Drawer_Open, R.string.navigation_Drawer_close );
         drawer.addDrawerListener( toggle );
         toggle.syncState();
-        setFragment( new MainFragment(), MAIN_FRAGMENT );
+        if (StaticValues.adminData.getAdminType().equals( StaticValues.TYPE_DELIVERY_BOY )){
+            setFragment( new NewOrder(), ORDER_LIST_FRAGMENT );
+            navigationView.getMenu().getItem( 1 ).setChecked( true );
+            navigationView.getMenu().getItem( 0 ).setEnabled( false );
+            navigationView.getMenu().getItem( 2 ).setEnabled( false );
+            navigationView.getMenu().getItem( 3 ).setEnabled( false );
+        }else{
+            setFragment( new MainFragment(), MAIN_FRAGMENT );
+        }
 
 //        TextView dEmail = drawer.findViewById( R.id.drawer_userEmail );
 //        TextView dName =drawer.findViewById( R.id.drawer_UserName );
@@ -112,10 +123,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            dEmail.setText( " " + StaticValues.adminData.getAdminEmail() );
 //        }
 
+        if ( DBquery.orderModelList.size() == 0){
+            DBquery.getOrderListQuery(  );
+        }
+
     }
 
     @Override
     public void onBackPressed() {
+        if (StaticValues.adminData.getAdminType().equals( StaticValues.TYPE_DELIVERY_BOY )){
+            super.onBackPressed();
+            navigationView.getMenu().getItem( 0 ).setEnabled( false );
+            navigationView.getMenu().getItem( 2 ).setEnabled( false );
+            navigationView.getMenu().getItem( 3 ).setEnabled( false );
+        }else
         switch (wCurrentFragment){
             case MAIN_FRAGMENT:
                 super.onBackPressed();
@@ -174,6 +195,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    //---------------------- Navigation Actions..--------------------------
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        if (wCurrentFragment == MAIN_FRAGMENT){
+            getMenuInflater().inflate( R.menu.main_nav_options,menu);
+
+            // notification badge...
+            MenuItem notificationItem = menu.findItem( R.id.menu_notification );
+            notificationItem.setActionView( R.layout.badge_notification_layout );
+            badgeNotifyCount = notificationItem.getActionView().findViewById( R.id.badge_count );
+            if (currentUser != null){
+                // Run user Notification Query to update...
+                DBquery.updateNotificationQuery( MainActivity.this,false );
+            }
+            notificationItem.getActionView().setOnClickListener( new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent catIntent = new Intent( MainActivity.this, NotificationsActivity.class);
+                    startActivity( catIntent );
+                }
+            } );
+
+        }
+
+        return true;
+    }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         drawer.closeDrawer( GravityCompat.START );

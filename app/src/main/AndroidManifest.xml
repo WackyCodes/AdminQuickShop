@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.shailendra.admin">
     <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -14,6 +15,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="true"
@@ -25,7 +27,8 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute"
         tools:replace="android:appComponentFactory">
-        <activity android:name=".addnewitem.AddLocation"></activity>
+        <activity android:name=".home.DeliveryBoyMainActivity"></activity>
+        <activity android:name=".addnewitem.AddLocation" />
         <activity android:name=".order.OrderDetailsActivity" />
         <activity android:name=".addnewitem.AddNewLayoutActivity" />
         <activity android:name=".home.CommonCatActivity" />

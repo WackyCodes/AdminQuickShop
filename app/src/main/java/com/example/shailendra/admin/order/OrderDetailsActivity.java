@@ -2,22 +2,36 @@ package com.example.shailendra.admin.order;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.shailendra.admin.DialogsClass;
 import com.example.shailendra.admin.R;
+import com.example.shailendra.admin.StaticMethods;
+import com.example.shailendra.admin.StaticValues;
 import com.example.shailendra.admin.database.DBquery;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.shailendra.admin.database.DBquery.orderModelList;
 
@@ -39,12 +53,19 @@ public class OrderDetailsActivity extends AppCompatActivity {
     private TextView noOfProducts; // no_of_products
     private RecyclerView  orderProductsRecycler; // order_product_det_recycler
 
+    // Conform Activity...
+    private FloatingActionButton successDeliveryBtn;
+
+    private Dialog dialog;
+
+    @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_order_details );
 
         index = getIntent().getIntExtra( "INDEX", -1 );
+        dialog = new DialogsClass().progressDialog( this );
 
         orderIdTxt = findViewById( R.id.orderId );
         deliveryStatus = findViewById( R.id.delivery_status );
@@ -85,7 +106,75 @@ public class OrderDetailsActivity extends AppCompatActivity {
         orderProductsRecycler.setAdapter( orderProductAdaptor );
         orderProductAdaptor.notifyDataSetChanged();
 
+
+        // Phone Call Action...
+        recieverMobile.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Make a phone Call...
+                makeAPhoneCall();
+            }
+        } );
+
+        // Order Success Button....
+        successDeliveryBtn = findViewById( R.id.floating_confirmDelivery );
+        if (StaticValues.adminData.getAdminType().equals( StaticValues.TYPE_DELIVERY_BOY )
+                && isShowSuccessOrderBtn() ){
+            successDeliveryBtn.setVisibility( View.VISIBLE );
+            successDeliveryBtn.setEnabled( true );
+        }else{
+            successDeliveryBtn.setVisibility( View.GONE );
+            successDeliveryBtn.setEnabled( false );
+        }
+
+        successDeliveryBtn.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.show();
+                successDeliveryBtn.setVisibility( View.GONE );
+                // Conform Order Delivered Code...
+                // 1. Update On Order...
+                // 2. Notify to User...
+                Map <String, Object> updateOrderMap = new HashMap <>();
+                // Put Delivery Info and Address..
+                updateOrderMap.put( "delivery_status", "SUCCESS" );
+                updateOrderMap.put( "delivered_by", StaticValues.adminData.getAdminName() );
+                updateOrderMap.put( "delivery_date_day", StaticMethods.getCurrentDateDay() );
+                updateOrderMap.put( "delivery_time", StaticMethods.getCurrentTime() );
+
+                DBquery.updateOrderStatusQuery( OrderDetailsActivity.this, dialog,
+                        orderModelList.get( index ).getOrderId(), updateOrderMap,
+                        orderModelList.get(index).getOrderByUserId() );
+
+                orderModelList.get(index).setOrderDeliveryStatus( "SUCCESS" );
+                deliveryStatus.setText( "SUCCESS" );
+            }
+        } );
+
     }
+
+    @SuppressLint("MissingPermission")
+    private void makeAPhoneCall(){
+        Intent callIntent = new Intent( Intent.ACTION_CALL );
+        callIntent.setData( Uri.parse( "tel:"+orderModelList.get(index).getOrderByUserPhone() ) );
+        if (ActivityCompat.checkSelfPermission(
+                OrderDetailsActivity.this, Manifest.permission.CALL_PHONE ) != PackageManager.PERMISSION_GRANTED){
+            Toast.makeText( this, "Permission Denied.! You have to give permission to make call.", Toast.LENGTH_SHORT ).show();
+            return;
+        }else{
+            startActivity( callIntent );
+        }
+    }
+
+    private boolean isShowSuccessOrderBtn(){
+
+        if (orderModelList.get(index).getOrderDeliveryStatus().equals( "ACCEPTED" )){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 
     private class OrderProductAdaptor extends RecyclerView.Adapter <OrderProductAdaptor.ViewHolder>{
 
