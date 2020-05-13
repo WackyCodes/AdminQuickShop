@@ -332,7 +332,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 // code to MainActivity....
                                 StaticValues.adminData.setAdminType( type );
 
-                                if (type.equals( "A" )){
+                                if (type.equals( StaticValues.TYPE_FOUNDER )){
                                     // Load All Area Code... To that certain city... And Set first as default...
                                     StaticValues.tempProductAreaCode = null;
                                     getAreaListQuery(dialog,  cityName);

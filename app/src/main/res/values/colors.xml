@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<color name="colorPrimary">#0A79DF</color>
-<color name="colorPrimaryDark">#07549B</color>
-<color name="colorAccent">#FFFFFF</color>
-<color name="colorViewAllBtn">#013a4b</color>
-<color name="colorSecondary">#013a4b</color>
-<color name="colorWhite">#ffffff</color>
-<color name="colorBlack">#000000</color>
-<color name="colorRed">#ff0004</color>
-<color name="colorGray">#A2A0A0</color>
-<color name="colorRecyclerBack">#DADADA</color>
-<color name="colorGreen">#4CAF50</color>
-<color name="colorBlue">#2196F3</color>
-<color name="colorYellow">#FFEB3B</color>
-<color name="colorPink">#DE05C8</color>
-<color name="colorTransparent">#00FFFFFF</color>
+    <color name="colorPrimary">#047507</color>
+    <color name="colorPrimaryDark">#3D7003</color>
+    <color name="colorAccent">#FFFFFF</color>
+    <color name="colorViewAllBtn">#013a4b</color>
+    <color name="colorSecondary">#013a4b</color>
+    <color name="colorWhite">#ffffff</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorRed">#ff0004</color>
+    <color name="colorGray">#A2A0A0</color>
+    <color name="colorRecyclerBack">#DADADA</color>
+    <color name="colorGreen">#4CAF50</color>
+    <color name="colorBlue">#2196F3</color>
+    <color name="colorYellow">#FFEB3B</color>
+    <color name="colorPink">#DE05C8</color>
+    <color name="colorTransparent">#00FFFFFF</color>
 
 
 </resources>

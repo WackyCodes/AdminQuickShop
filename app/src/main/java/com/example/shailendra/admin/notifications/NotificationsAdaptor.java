@@ -193,7 +193,7 @@ public class NotificationsAdaptor extends RecyclerView.Adapter<RecyclerView.View
                             intent.putExtra( "INDEX", i );
                             itemView.getContext().startActivity( intent );
                             break;
-                        }else if ( i == DBquery.orderModelList.size()){
+                        }else if ( i == DBquery.orderModelList.size()-1){
                             DBquery.addOneInOrderListQuery( orderId, itemView.getContext(), true );
                             break;
                         }
@@ -206,6 +206,7 @@ public class NotificationsAdaptor extends RecyclerView.Adapter<RecyclerView.View
         private void queryToNotifyUser(String notifyUserId, final String orderId){
             Map <String, Object> userData = new HashMap <>();
             userData.put( "notify_type", "ORDER_UPDATE" );
+            userData.put( "notify_id", StaticValues.getRandomOrderID() );
             userData.put( "notify_image", " " );
             userData.put( "notify_order_id", orderId );
             userData.put( "notify_heading", "Order Accepted.!" );

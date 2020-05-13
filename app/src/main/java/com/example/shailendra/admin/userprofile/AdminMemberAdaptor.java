@@ -1,6 +1,7 @@
 package com.example.shailendra.admin.userprofile;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.view.LayoutInflater;
@@ -98,15 +99,32 @@ public class AdminMemberAdaptor extends RecyclerView.Adapter<AdminMemberAdaptor.
 
             if (authId != null){
                 userAuth.setText( "created" );
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    contentLayout.setBackgroundTintList( ColorStateList.valueOf( R.color.colorGreen ) );
-                }
+                userAuth.setTextColor( ColorStateList.valueOf( R.color.colorGreen ) );
             }else{
                 userAuth.setText( "Not auth yet.!" );
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    contentLayout.setBackgroundTintList( ColorStateList.valueOf( R.color.colorRed ) );
-                }
+                userAuth.setTextColor( ColorStateList.valueOf( R.color.colorRed ) );
             }
+
+
+            contentLayout.setOnClickListener( new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // OnClick...
+                    Intent showAdminIntent = new Intent(itemView.getContext(), ShowAdminActivity.class);
+
+                    showAdminIntent.putExtra( "ADMIN_ID", "");
+                    showAdminIntent.putExtra( "ADMIN_PIC", "");
+                    showAdminIntent.putExtra( "ADMIN_NAME", "");
+                    showAdminIntent.putExtra( "ADMIN_MOBILE", "");
+                    showAdminIntent.putExtra( "ADMIN_EMAIL", "");
+                    showAdminIntent.putExtra( "ADMIN_TYPE", "");
+                    showAdminIntent.putExtra( "ADMIN_PERMISSION", "");
+                    showAdminIntent.putExtra( "ADMIN_CITY", "");
+
+                    itemView.getContext().startActivity( showAdminIntent );
+
+                }
+            } );
 
             // TODO : Spinner Set..
 

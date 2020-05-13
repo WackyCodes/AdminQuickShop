@@ -359,7 +359,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
-                android:background="@drawable/back_white_one__dp"
+                android:background="@color/colorWhite"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
                 android:padding="8dp">
@@ -386,13 +386,12 @@
                     android:textSize="18dp"
                     android:textStyle="bold" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/order_product_det_recycler"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
             </LinearLayout>
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/order_product_det_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
     </ScrollView>

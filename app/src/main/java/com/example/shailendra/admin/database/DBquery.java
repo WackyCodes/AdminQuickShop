@@ -284,7 +284,7 @@ public class DBquery {
         return true;
     }
 
-    public static void getMemberListQuery(String cityName, final Dialog dialog){
+    public static void getMemberListQuery(final String cityName, final Dialog dialog){
         adminMemberList.clear();
 
         firebaseFirestore.collection( "ADMIN_PER" ).document( cityName.toUpperCase() )
@@ -305,9 +305,11 @@ public class DBquery {
                         long id = (long)documentSnapshot.get( "id" );
                         String authId = documentSnapshot.get( "auth_id" ).toString();
 
-//                    String address = task.getResult().get( "address" ).toString();
-//                    String addPin = task.getResult().get( "add_pin" ).toString();
-//                    String ciyName = task.getResult().get( "area_city" ).toString();
+                        String address = documentSnapshot.get( "address" ).toString();
+                        String addPin = documentSnapshot.get( "add_pin" ).toString();
+                        String areaCode = documentSnapshot.get( "area_code" ).toString();
+//                        String ciyName = documentSnapshot.get( "area_city" ).toString();
+                        String ciyName = cityName;
 //                    String areaCode = areaCode;
 
 //                    (String adminName, String adminMobile, String adminEmail, boolean adminPermission, String adminType, String adminPhoto,
@@ -315,8 +317,8 @@ public class DBquery {
 //                            String adminCityName, String adminAreaCode) {
 
                         adminMemberList.add( new AdminData( name, mobile, email, adminPermission, type,
-                                photo, null, null, String.valueOf( id ),
-                                authId, null, null  ) );
+                                photo, address, addPin, String.valueOf( id ),
+                                authId, ciyName, areaCode  ) );
 
                         if (AdminMemberList.adminMemberAdaptor != null){
                             AdminMemberList.adminMemberAdaptor.notifyDataSetChanged();
@@ -491,6 +493,7 @@ public class DBquery {
 
                     Map <String, Object> userData = new HashMap <>();
                     userData.put( "notify_type", "ORDER_UPDATE" );
+                    userData.put( "notify_id", StaticValues.getRandomOrderID() );
                     userData.put( "notify_image", " " );
                     userData.put( "notify_order_id", orderId );
                     userData.put( "notify_heading", "Delivered.!" );
@@ -612,16 +615,41 @@ public class DBquery {
     // Notify User....
     public static void queryToNotifyUser(Context context,@Nullable final Dialog dialog, String notifyUserId, Map <String, Object> notifyMap){
 
+        String notify_id = notifyMap.get( "notify_id" ).toString();
+
         firebaseFirestore.collection( "USER" ).document( notifyUserId )
-                .collection( "USER_NOTIFICATION" ).add( notifyMap )
-                .addOnCompleteListener( new OnCompleteListener <DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task <DocumentReference> task) {
-                        if (dialog != null){
-                            dialog.dismiss();
-                        }
-                    }
-                } );
+                .collection( "USER_NOTIFICATION" )
+                .document( notify_id ).set( notifyMap )
+                .addOnCompleteListener( new OnCompleteListener <Void>() {
+            @Override
+            public void onComplete(@NonNull Task <Void> task) {
+                if (dialog != null){
+                    dialog.dismiss();
+                }
+            }
+        } );
+
+    }
+
+    public static void queryToUpdateAdminData(@Nullable final Dialog dialog, String adminCityName, String adminMobileID, Map<String, Object> updateMap){
+
+        FirebaseFirestore.getInstance().collection( "ADMIN_PER" )
+                .document( adminCityName.toUpperCase() )
+                .collection( "PERMISSION" ).document( adminMobileID )
+                .update( updateMap ).addOnCompleteListener( new OnCompleteListener <Void>() {
+            @Override
+            public void onComplete(@NonNull Task <Void> task) {
+                if (dialog!= null){
+                    dialog.dismiss();
+                }
+                if (task.isSuccessful()){
+                    // Successful Updates...
+                }else{
+                    // Failed To Update...
+                }
+            }
+        } );
+
     }
 
 

@@ -8,7 +8,6 @@
     android:layout_marginBottom="2dp"
     android:layout_height="wrap_content">
 
-
     <LinearLayout
         android:id="@+id/member_item_layout"
         android:layout_width="match_parent"
@@ -47,7 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Tarun Bisen"
+                    android:text="UserName"
                     android:textColor="@color/colorSecondary"
                     android:textStyle="bold"
                     android:textSize="16sp"/>
@@ -71,7 +70,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="8989989858"
+                    android:text="91xxxxxx01"
                     android:textColor="@color/colorSecondary"
                     android:textStyle="bold"
                     android:textSize="16sp"/>
@@ -120,7 +119,7 @@
                     android:id="@+id/memberPermissionSpinner"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="A"
+                    android:text=""
                     android:textColor="@color/colorBlack"
                     android:textStyle="italic"
                     android:textSize="16sp"
@@ -155,6 +154,5 @@
         </LinearLayout>
 
     </LinearLayout>
-
 
 </LinearLayout>

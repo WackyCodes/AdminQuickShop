@@ -95,7 +95,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
         billAmount.setText( orderModelList.get(index).getOrderBillAmount() );
         deliveryCharge.setText( orderModelList.get(index).getOrderDeliveryCharge() );
         payMode.setText( orderModelList.get(index).getOrderPayMode() );
-//        noOfProducts.setText( orderModelList.get(index).getNoOfProducts());
+        noOfProducts.setText( "Total Products: " +orderModelList.get(index).getOrderProductModelList().size());
 
 //        orderProductsRecycler
 

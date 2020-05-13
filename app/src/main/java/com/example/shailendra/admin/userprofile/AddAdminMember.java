@@ -1,6 +1,5 @@
 package com.example.shailendra.admin.userprofile;
 
-
 import android.app.Dialog;
 import android.os.Bundle;
 
@@ -43,7 +42,6 @@ import java.util.regex.Pattern;
 
 import static com.example.shailendra.admin.StaticValues.MEMBER_LIST_FRAGMENT;
 import static com.example.shailendra.admin.userprofile.RegisterActivity.cityList;
-
 
 public class AddAdminMember extends Fragment {
 
@@ -210,6 +208,7 @@ public class AddAdminMember extends Fragment {
             }
         } );
         return view;
+
     }
 
     @Override

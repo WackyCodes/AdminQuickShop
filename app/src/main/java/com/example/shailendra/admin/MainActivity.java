@@ -105,13 +105,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle( this, drawer, toolbar, R.string.navigation_Drawer_Open, R.string.navigation_Drawer_close );
         drawer.addDrawerListener( toggle );
         toggle.syncState();
+
         if (StaticValues.adminData.getAdminType().equals( StaticValues.TYPE_DELIVERY_BOY )){
+            // For Delivery Boy...
             setFragment( new NewOrder(), ORDER_LIST_FRAGMENT );
             navigationView.getMenu().getItem( 1 ).setChecked( true );
             navigationView.getMenu().getItem( 0 ).setEnabled( false );
             navigationView.getMenu().getItem( 2 ).setEnabled( false );
             navigationView.getMenu().getItem( 3 ).setEnabled( false );
+        }else if( StaticValues.adminData.getAdminType().equals( StaticValues.TYPE_PRODUCT_MANAGER )){
+            // Product Manager Access.....
+            navigationView.getMenu().getItem( 2 ).setEnabled( false );
+            navigationView.getMenu().getItem( 3 ).setEnabled( false );
         }else{
+            // Founder...
             setFragment( new MainFragment(), MAIN_FRAGMENT );
         }
 

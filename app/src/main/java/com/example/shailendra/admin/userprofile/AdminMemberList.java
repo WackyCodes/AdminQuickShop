@@ -43,6 +43,7 @@ public class AdminMemberList extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate( R.layout.fragment_admin_member_list, container, false );
+        Dialog dialog = new DialogsClass().progressDialog( getContext() );
 
         adminListRecycler = view.findViewById( R.id.member_list_recycler );
         addNewMemberLayout = view.findViewById( R.id.add_new_member_layout );
@@ -57,16 +58,27 @@ public class AdminMemberList extends Fragment {
         adminMemberAdaptor.notifyDataSetChanged();
 
         if (DBquery.adminMemberList.size() == 0){
-            // TODO : Request query...
-            Dialog dialog = new DialogsClass().progressDialog( getContext() );
+
             dialog.show();
+
             if (StaticValues.userCityName != null){
+
                 DBquery.getMemberListQuery( StaticValues.userCityName, dialog);
             }else{
                 Toast.makeText( getContext(), "Please select City First.!", Toast.LENGTH_SHORT ).show();
                 dialog.dismiss();
             }
 
+        }
+        else{
+            if (StaticValues.userCityName != null){
+                if (!DBquery.adminMemberList.get( 0 ).getAdminCityName().toUpperCase().equals( StaticValues.userCityName.toUpperCase() )){
+                    dialog.show();
+                    DBquery.getMemberListQuery( StaticValues.userCityName, dialog);
+                }
+            }else{
+                Toast.makeText( getContext(), "Please select City First.!", Toast.LENGTH_SHORT ).show();
+            }
         }
 
         addNewMemberLayout.setOnClickListener( new View.OnClickListener() {
