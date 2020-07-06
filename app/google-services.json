@@ -1,42 +1,42 @@
 {
   "project_info": {
-    "project_number": "645123181025",
-    "firebase_url": "https://quickshop-1641f.firebaseio.com",
-    "project_id": "quickshop-1641f",
-    "storage_bucket": "quickshop-1641f.appspot.com"
+    "project_number": "118963797098",
+    "firebase_url": "https://lets-shop-bhopal.firebaseio.com",
+    "project_id": "lets-shop-bhopal",
+    "storage_bucket": "lets-shop-bhopal.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:645123181025:android:759d8375fa33310891aaa0",
+        "mobilesdk_app_id": "1:118963797098:android:3d88cee622007a28da9e13",
         "android_client_info": {
-          "package_name": "com.example.shailendra.admin"
+          "package_name": "com.ecom.letsshop.admin"
         }
       },
       "oauth_client": [
         {
-          "client_id": "645123181025-l4101c0r530arp6e1gt01ugd1m4msptq.apps.googleusercontent.com",
+          "client_id": "118963797098-t3ah1qs03i59ev8h5vdnmsfrvmonp9rt.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.shailendra.admin",
+            "package_name": "com.ecom.letsshop.admin",
             "certificate_hash": "2b09d137b0d1dcf2cea398c449eafcbc7273b428"
           }
         },
         {
-          "client_id": "645123181025-0sb4209ofe00eo4cco3cqa590g9bpijh.apps.googleusercontent.com",
+          "client_id": "118963797098-5qns0svgt7clh8e4ujt1p9c5729p38k6.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA6yrkNTKndVYMhdKdvo38JmBqwreQPylg"
+          "current_key": "AIzaSyDGklxg_4w_NHzbLSsIU9lKFhk2SOh42hI"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "645123181025-0sb4209ofe00eo4cco3cqa590g9bpijh.apps.googleusercontent.com",
+              "client_id": "118963797098-5qns0svgt7clh8e4ujt1p9c5729p38k6.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
@@ -45,35 +45,35 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:645123181025:android:ce065fdb3afc0f18",
+        "mobilesdk_app_id": "1:118963797098:android:4d78655e05c542b9da9e13",
         "android_client_info": {
-          "package_name": "com.example.shailendra.quickshop"
+          "package_name": "com.user.ecom.letsshop"
         }
       },
       "oauth_client": [
         {
-          "client_id": "645123181025-sv6av0bufve52ut5gds7g5agh5lks8nq.apps.googleusercontent.com",
+          "client_id": "118963797098-bkl5qk9erft3ffhf7h0ucbql7bro63ju.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.shailendra.quickshop",
+            "package_name": "com.user.ecom.letsshop",
             "certificate_hash": "2b09d137b0d1dcf2cea398c449eafcbc7273b428"
           }
         },
         {
-          "client_id": "645123181025-0sb4209ofe00eo4cco3cqa590g9bpijh.apps.googleusercontent.com",
+          "client_id": "118963797098-5qns0svgt7clh8e4ujt1p9c5729p38k6.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA6yrkNTKndVYMhdKdvo38JmBqwreQPylg"
+          "current_key": "AIzaSyDGklxg_4w_NHzbLSsIU9lKFhk2SOh42hI"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "645123181025-0sb4209ofe00eo4cco3cqa590g9bpijh.apps.googleusercontent.com",
+              "client_id": "118963797098-5qns0svgt7clh8e4ujt1p9c5729p38k6.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

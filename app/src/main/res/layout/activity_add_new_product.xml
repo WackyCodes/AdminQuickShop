@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.shailendra.admin.addnewitem.AddNewProductActivity">
+    tools:context="com.ecom.letsshop.admin.addnewitem.AddNewProductActivity">
 
     <TextView
         android:id="@+id/sample_heading"
@@ -157,13 +157,39 @@
                     android:theme="@style/EditTextTheme"
                     android:textSize="20dp" />
                 <!-- Short Name...-->
-                <TextView
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="10dp"
-                    android:text="Product Short Name*"
-                    android:textColor="@color/colorSecondary"
-                    android:textSize="18dp" />
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:text="Product Short Name*"
+                        android:textColor="@color/colorSecondary"
+                        android:textSize="18dp" />
+
+                    <Switch
+                        android:id="@+id/new_pro_short_name_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/back_white_one__dp"
+                        android:checked="false"
+                        android:drawableTint="@color/colorPrimary"
+                        android:paddingVertical="1dp"
+                        android:switchPadding="8dp"
+                        android:paddingLeft="4dp"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="right"
+                        android:text="Same :"
+                        android:textColor="@color/colorPrimary"
+                        android:textOff="@android:string/no"
+                        android:textOn="@android:string/yes"
+                        android:textSize="18dp" />
+
+                </LinearLayout>
 
                 <EditText
                     android:id="@+id/new_pro_short_name"
@@ -190,6 +216,7 @@
                     android:drawableTint="@color/colorGray"
                     android:gravity="center"
                     android:padding="1dp"
+                    android:visibility="gone"
                     android:layout_margin="8dp"
                     android:orientation="horizontal">
 

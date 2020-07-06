@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:id="@+id/addMemberFrame"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.example.shailendra.admin.userprofile.AddAdminMember">
+    tools:context="com.ecom.letsshop.admin.userprofile.AddAdminMember">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:background="@color/colorWhite"

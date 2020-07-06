@@ -30,9 +30,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:textColor="#000000"
-        android:text="This is very Good product in India. Nokia 1250 is best phone for general purpose. It's a RFID attendance System for School management and colleges. This is very Good product in India. Nokia 1250 is best phone for general purpose. It's a RFID attendance System for School management and colleges.This is very Good product in India. Nokia 1250 is best phone for general purpose. It's a RFID attendance System for School management and colleges.
-This is very Good product in India. Nokia 1250 is best phone for general purpose. It's a RFID attendance System for School management and colleges.
-This is very Good product in India. Nokia 1250 is best phone for general purpose. It's a RFID attendance System for School management and colleges.This is very Good product in India. Nokia 1250 is best phone for general purpose. It's a RFID attendance System for School management and colleges."
+        android:text="--"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />

@@ -17,7 +17,6 @@
         android:elevation="3dp"
         android:padding="15dp"
         android:background="@drawable/back_white_round_zero_border"
-        android:tint="@color/colorPrimary"
         android:src="@drawable/square_placeholder"/>
     <TextView
         android:id="@+id/add_item_title"

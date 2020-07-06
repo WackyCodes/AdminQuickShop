@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:id="@+id/main_fragment_frameLayout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.example.shailendra.admin.home.MainFragment">
+    tools:context="com.ecom.letsshop.admin.home.MainFragment">
 
 
     <LinearLayout

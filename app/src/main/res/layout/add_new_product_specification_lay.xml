@@ -179,7 +179,6 @@
         </LinearLayout>
     </LinearLayout>
 
-
     <LinearLayout
         android:id="@+id/add_new_sp_lay_btn_layout"
         android:layout_width="match_parent"
@@ -288,6 +287,5 @@
             android:textSize="18dp"
             android:textStyle="bold" />
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

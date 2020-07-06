@@ -37,6 +37,7 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/colorTransparent"
             android:tint="@color/colorPrimary"
+            android:paddingRight="-1dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_more_vert_black_24dp"
@@ -53,7 +54,7 @@
             android:layout_marginRight="2dp"
             android:maxLines="2"
             android:padding="1dp"
-            android:text="Xiomi Note 5 | 3GB+32GB | available in India only"
+            android:text=" "
             android:textColor="#000000"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -69,7 +70,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
             android:padding="1dp"
-            android:text="$7,999/-"
+            android:text=" "
             android:textColor="#000"
             android:textSize="12sp"
             android:textStyle="bold"
@@ -83,7 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:padding="1dp"
-            android:text="$8,999/-"
+            android:text="-"
             android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="@+id/hr_product_price"
             app:layout_constraintStart_toEndOf="@+id/hr_product_price" />
@@ -102,12 +103,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="1dp"
-            android:text="20% off"
+            android:text=" "
             android:textColor="#4CAF50"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@+id/hr_product_cut_price"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/hr_product_cut_price" />
+
         <TextView
             android:id="@+id/stock_text"
             android:layout_width="wrap_content"
@@ -118,7 +120,7 @@
             android:paddingRight="6dp"
             android:text="In Stock (99)"
             android:textColor="@color/colorWhite"
-            app:layout_constraintBottom_toBottomOf="@+id/hr_product_image"
+            app:layout_constraintBottom_toTopOf="@+id/hr_product_name"
             app:layout_constraintEnd_toEndOf="@+id/hr_product_image" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -4,7 +4,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
-        applicationId "com.example.shailendra.quickshop"
+        applicationId "com.ecom.letsshop.admin"
         minSdkVersion 16
         targetSdkVersion 29
         multiDexEnabled true
@@ -27,7 +27,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
-    // -----------------------------------------------------------
+    // --------------------------------------------------------
     testImplementation 'junit:junit:4.13'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta3'

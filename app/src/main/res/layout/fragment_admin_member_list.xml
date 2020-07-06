@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/admin_member_list_frame"
-    tools:context="com.example.shailendra.admin.userprofile.AdminMemberList">
+    tools:context="com.ecom.letsshop.admin.userprofile.AdminMemberList">
 
 
     <LinearLayout

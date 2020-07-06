@@ -4,6 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.shailendra.admin.home.DeliveryBoyMainActivity">
+    tools:context="com.ecom.letsshop.admin.home.DeliveryBoyMainActivity">
 
 </androidx.constraintlayout.widget.ConstraintLayout>

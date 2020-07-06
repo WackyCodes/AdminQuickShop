@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorRecyclerBack"
-    tools:context="com.example.shailendra.admin.order.OrderDetailsActivity">
+    tools:context="com.ecom.letsshop.admin.order.OrderDetailsActivity">
 
 
     <ScrollView
